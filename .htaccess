@@ -1,0 +1,13 @@
+# Desactivar el puente de Node/Python anterior para habilitar PHP Nativo directamente
+PassengerEnabled off
+
+# Forzar la conexión segura HTTPS (excluyendo verificación y cargador temporal)
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/upload_helper\.php
+RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Configuración básica de reescritura para mayor seguridad y enlaces limpios
+DirectoryIndex index.php
+Options -Indexes

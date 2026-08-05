@@ -1,0 +1,1111 @@
+/* CSS Variables representing XCOLNET Branding & Accenture-style contrasts */
+:root {
+    --tech-bg: #0B1220;
+    --tech-primary: #0A84FF;
+    --tech-cyan: #00C2FF;
+    --tech-grey: #E5E7EB;
+    --tech-dark-card: #0F182A;
+    --tech-border: rgba(0, 194, 255, 0.18);
+    --tech-glow-subtle: 0 0 15px rgba(0, 194, 255, 0.2);
+    --white: #FFFFFF;
+    
+    /* Type colors */
+    --color-peticion: #00C2FF;
+    --color-queja: #FFC107;
+    --color-reclamo: #FF5252;
+    --color-sugerencia: #69F0AE;
+}
+
+/* Base Body Styles */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--tech-bg);
+    color: var(--tech-grey);
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden; /* Evita scrolls horizontales accidentales en dispositivos móviles */
+}
+
+body {
+    background-image: linear-gradient(rgba(10, 20, 38, 0.85), rgba(10, 20, 38, 0.85)), url('tech_background_1782764047012.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.tech-bg {
+    min-height: 100vh;
+}
+
+/* Accenture-style Left-aligned Headers & Typography */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--white);
+    font-weight: 800;
+}
+
+.section-title {
+    font-family: 'Outfit', sans-serif; /* Accenture uses clean modern grotesque fonts */
+    font-size: clamp(2.2rem, 6vw, 3rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    color: var(--white);
+    text-transform: none; /* Accenture uses sentence case or title case, not uppercase */
+    text-align: left;
+}
+
+.title-underline-accenture {
+    width: 60px;
+    height: 4px;
+    background-color: var(--tech-cyan);
+    margin: 15px 0 25px 0; /* Left aligned */
+    box-shadow: 0 0 8px var(--tech-cyan);
+}
+
+.section-subtitle-left {
+    color: #8C99B2;
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 0 40px 0; /* Left aligned */
+    line-height: 1.6;
+}
+
+/* Transparent Glassmorphism Navbar */
+.tech-navbar {
+    background: rgba(11, 18, 32, 0.9) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--tech-border);
+    padding: 20px 0;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.tech-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.7rem;
+    letter-spacing: 1px;
+    color: var(--white) !important;
+    text-shadow: 0 0 10px rgba(10, 132, 255, 0.3);
+}
+
+.logo-accent {
+    color: var(--tech-cyan);
+}
+
+.tech-nav-list .nav-link {
+    color: var(--tech-grey) !important;
+    font-size: 1.05rem;
+    font-weight: 500;
+    padding: 6px 16px !important;
+    margin: 0 4px;
+    border-radius: 4px;
+    transition: all 0.25s ease;
+}
+
+.tech-nav-list .nav-link:hover {
+    color: var(--tech-cyan) !important;
+    background: rgba(0, 194, 255, 0.05);
+}
+
+/* Hero Section (Accenture-style Left-aligned with large font) */
+/* Hero Section (Modern Two-Column Layout) */
+.hero-section {
+    position: relative;
+    padding: 160px 0 100px 0;
+    overflow: hidden;
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+}
+
+.hero-glow {
+    position: absolute;
+    top: 30%;
+    left: 15%;
+    transform: translate(-50%, -50%);
+    width: 650px;
+    height: 650px;
+    background: radial-gradient(circle, rgba(0, 194, 255, 0.08) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Nombre de la marca destacado en el Hero */
+.hero-brand {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 5.5vw, 3.4rem);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    color: var(--white);
+    text-shadow: 0 0 25px rgba(0, 194, 255, 0.4);
+    display: inline-block;
+}
+
+
+
+/* Efecto de iluminación neón letra por letra en hover */
+.glow-text-container {
+    display: inline;
+}
+
+.glow-char {
+    display: inline-block;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease, text-shadow 0.2s ease;
+    cursor: default;
+    color: inherit;
+}
+
+.glow-char:hover {
+    color: var(--tech-cyan) !important;
+    text-shadow: 0 0 15px var(--tech-cyan), 0 0 30px var(--tech-cyan);
+    transform: translateY(-0.18em) scale(1.08); /* Bounce suave en hover */
+}
+
+.glow-char-space {
+    display: inline;
+}
+
+.hero-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2.1rem, 4.5vw, 3.6rem); /* Ligeramente más pequeña para balancear el nuevo texto */
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    margin-bottom: 25px;
+    color: var(--white);
+    max-width: 680px; /* Ajustado ligeramente de 620px a 680px para dar cabida al nuevo texto de forma equilibrada */
+    white-space: normal !important; /* Asegura la correcta distribución en varias líneas en cualquier pantalla */
+}
+
+.text-cyan-glow {
+    color: var(--tech-cyan);
+    text-shadow: 0 0 25px rgba(0, 194, 255, 0.35);
+}
+
+.hero-desc {
+    font-size: 1.18rem;
+    color: #94A3B8;
+    max-width: 600px;
+    margin: 0 0 35px 0;
+    line-height: 1.65;
+}
+
+
+
+@keyframes tech-float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-15px) rotate(1deg);
+    }
+}
+
+/* Accenture-style Buttons (Sharp corners, high contrast) */
+.btn-tech-primary {
+    background: var(--tech-cyan);
+    color: var(--tech-bg);
+    font-weight: 700;
+    padding: 14px 35px;
+    border-radius: 2px;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.btn-tech-primary:hover {
+    transform: translateY(-2px);
+    background: var(--white);
+    color: var(--tech-bg);
+    box-shadow: 0 10px 25px rgba(0, 194, 255, 0.25);
+}
+
+.btn-tech-ghost {
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--white);
+    font-weight: 700;
+    padding: 14px 35px;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.btn-tech-ghost:hover {
+    transform: translateY(-2px);
+    background: rgba(0, 194, 255, 0.06);
+    border-color: var(--tech-cyan);
+    color: var(--tech-cyan);
+    box-shadow: 0 10px 25px rgba(0, 194, 255, 0.15);
+}
+
+/* Accenture-inspired Border Grid System for Services */
+.services-border-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-top: 1px solid var(--tech-border);
+    border-left: 1px solid var(--tech-border);
+    margin-top: 30px;
+}
+
+@media (min-width: 768px) {
+    .services-border-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 992px) {
+    .services-border-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+.grid-service-item {
+    background: rgba(15, 24, 42, 0.55);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-right: 1px solid var(--tech-border);
+    border-bottom: 1px solid var(--tech-border);
+    padding: 45px 35px;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 290px;
+}
+
+/* Service Background Image (Fotos de fondo originales se conservan intactas) */
+.service-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.12; /* Sutil por defecto para no interferir con la legibilidad */
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.grid-service-item:hover .service-bg {
+    transform: scale(1.06);
+    opacity: 0.32; /* Aumenta sutilmente la visibilidad de la imagen en hover */
+}
+
+/* Asegurar que el contenido se superponga a la imagen */
+.grid-service-item > *:not(.service-bg) {
+    position: relative;
+    z-index: 2;
+}
+
+/* Efecto de borde resplandeciente vertical en hover */
+.grid-service-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--tech-cyan), var(--tech-primary));
+    transform: scaleY(0);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transform-origin: top;
+    z-index: 3;
+}
+
+.grid-service-item:hover::before {
+    transform: scaleY(1);
+}
+
+.grid-service-item:hover {
+    background: rgba(15, 24, 42, 0.85);
+    box-shadow: 0 15px 35px rgba(0, 194, 255, 0.08);
+    border-right-color: rgba(0, 194, 255, 0.25);
+    border-bottom-color: rgba(0, 194, 255, 0.25);
+}
+
+/* Iconos de servicio siempre visibles con transición de resplandor */
+.grid-service-icon {
+    font-size: 2.2rem;
+    display: inline-block;
+    margin-bottom: 20px;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease;
+    z-index: 2;
+}
+
+.grid-service-item:hover .grid-service-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(0, 194, 255, 0.8));
+}
+
+.grid-service-item h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--white);
+    transition: color 0.3s ease;
+    z-index: 2;
+}
+
+.grid-service-item:hover h3 {
+    color: var(--tech-cyan);
+}
+
+.grid-service-item p {
+    font-size: 0.98rem;
+    color: #94A3B8;
+    line-height: 1.6;
+    margin-bottom: 0;
+    z-index: 2;
+    transition: color 0.3s ease;
+}
+
+.grid-service-item:hover p {
+    color: #E2E8F0;
+}
+
+/* About Column Layout */
+.about-accenture-col {
+    border-top: 2px solid var(--tech-border);
+    padding-top: 30px;
+}
+
+.about-accenture-col h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.6rem;
+    color: var(--tech-cyan);
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.about-accenture-col p {
+    font-size: 1.05rem;
+    color: #94A3B8;
+    line-height: 1.65;
+}
+
+.values-container-accenture {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 30px 0;
+    margin-top: 40px;
+}
+
+.values-title-accenture {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.values-list-accenture {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.value-tag-accenture {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: var(--white);
+    padding: 10px 22px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.value-tag-accenture:hover {
+    border-color: var(--tech-cyan);
+    color: var(--tech-cyan);
+    background: rgba(0, 194, 255, 0.03);
+}
+
+/* PQRS Form (Accenture-style border-bottom fields) */
+.pqrs-container-accenture {
+    background: var(--tech-dark-card);
+    border: 1px solid var(--tech-border);
+    padding: 60px 45px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.tech-form-accenture .form-label {
+    color: var(--tech-cyan);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.tech-input-accenture {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.15) !important;
+    color: var(--white) !important;
+    border-radius: 0 !important; /* Sharp corners */
+    padding: 12px 0 !important;
+    font-size: 1.1rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: none !important;
+}
+
+.tech-input-accenture:focus {
+    border-bottom-color: var(--tech-cyan) !important;
+}
+
+.tech-input-accenture::placeholder {
+    color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.tech-input-accenture option {
+    background: var(--tech-bg);
+    color: var(--white);
+}
+
+/* Submit Button */
+.btn-tech-submit-accenture {
+    background: var(--tech-cyan);
+    color: var(--tech-bg);
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 16px;
+    border-radius: 0; /* Sharp corners */
+    border: none;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 1rem;
+}
+
+.btn-tech-submit-accenture:hover {
+    background: var(--white);
+    color: var(--tech-bg);
+    box-shadow: 0 8px 25px rgba(255,255,255,0.15);
+}
+
+/* Admin Link Below Form */
+.admin-link-accenture {
+    color: #94A3B8;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.admin-link-accenture:hover {
+    color: var(--tech-cyan);
+    text-shadow: 0 0 5px var(--tech-cyan);
+}
+
+/* Alerts and Validation */
+.alert-tech-success {
+    background: rgba(105, 240, 174, 0.08);
+    border: 1px solid var(--color-sugerencia);
+    color: var(--color-sugerencia);
+    border-radius: 0;
+    font-weight: 600;
+    padding: 15px;
+}
+
+.text-danger-glow {
+    color: var(--color-reclamo);
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Stat Cards in Admin view */
+.stat-card {
+    background: var(--tech-dark-card);
+    border: 1px solid var(--tech-border);
+    border-radius: 0;
+    padding: 30px 15px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.stat-num {
+    display: block;
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    margin-bottom: 5px;
+    text-shadow: 0 0 8px currentColor;
+}
+
+.stat-label {
+    color: #8C99B2;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.color-peticion { color: var(--color-peticion); }
+.color-queja { color: var(--color-queja); }
+.color-reclamo { color: var(--color-reclamo); }
+.color-sugerencia { color: var(--color-sugerencia); }
+
+/* Tech Table */
+.tech-table-wrapper {
+    background: rgba(19, 26, 42, 0.8);
+    border: 1px solid var(--tech-border);
+    border-radius: 0;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.tech-table {
+    margin-bottom: 0 !important;
+    color: var(--tech-grey) !important;
+}
+
+.tech-table th {
+    background: rgba(11, 18, 32, 0.95) !important;
+    color: var(--tech-cyan) !important;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    padding: 18px 20px !important;
+    border-bottom: 2px solid var(--tech-border) !important;
+}
+
+.tech-table td {
+    padding: 18px 20px !important;
+    border-bottom: 1px solid rgba(0, 194, 255, 0.08) !important;
+    background: transparent !important;
+}
+
+.tech-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.tech-table tbody tr:hover {
+    background: rgba(0, 194, 255, 0.03) !important;
+}
+
+.tech-date-cell {
+    font-weight: 700;
+    color: var(--white);
+}
+
+.tech-time {
+    display: block;
+    font-size: 0.8rem;
+    color: #64748B;
+    font-weight: 400;
+}
+
+.tech-name-cell {
+    font-weight: 600;
+    color: var(--white);
+}
+
+.tech-contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.tech-email-link {
+    color: var(--tech-cyan);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.tech-email-link:hover {
+    color: var(--white);
+}
+
+.tech-phone {
+    font-size: 0.85rem;
+    color: #94A3B8;
+}
+
+.tech-msg-cell {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #E2E8F0;
+}
+
+/* Custom Badges */
+.tech-badge {
+    padding: 6px 14px;
+    border-radius: 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-peticion {
+    background: rgba(0, 194, 255, 0.1);
+    color: var(--color-peticion);
+    border: 1px solid var(--color-peticion);
+}
+
+.badge-queja {
+    background: rgba(255, 193, 7, 0.1);
+    color: var(--color-queja);
+    border: 1px solid var(--color-queja);
+}
+
+.badge-reclamo {
+    background: rgba(255, 82, 82, 0.1);
+    color: var(--color-reclamo);
+    border: 1px solid var(--color-reclamo);
+}
+
+.badge-sugerencia {
+    background: rgba(105, 240, 174, 0.1);
+    color: var(--color-sugerencia);
+    border: 1px solid var(--color-sugerencia);
+}
+
+/* Master Footer */
+.tech-footer {
+    background: #05080E;
+    border-top: 1px solid var(--tech-border);
+    padding: 60px 0 40px 0;
+    color: #94A3B8;
+}
+
+.footer-title {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--white);
+    letter-spacing: 1.5px;
+    margin-bottom: 15px;
+}
+
+.footer-slogan {
+    font-size: 1rem;
+    color: var(--tech-cyan);
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.footer-links li {
+    margin: 0 15px;
+}
+
+.footer-links a {
+    color: var(--tech-grey);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--tech-cyan);
+}
+
+.footer-copy {
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+@media (min-width: 768px) {
+    .footer-links {
+        justify-content: flex-end;
+    }
+}
+
+/* Footer Social Icons - Modern & Hover Effects */
+.footer-social {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+    .footer-social {
+        justify-content: flex-end;
+    }
+}
+
+.footer-social a {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+}
+
+.footer-social a:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+    transform: translateY(-3px);
+}
+
+.footer-social a svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    transition: fill 0.3s ease;
+}
+
+/* WhatsApp Floating Container with EVE Robot Assistant */
+.whatsapp-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1000;
+    pointer-events: none; /* Allow clicks to pass through transparent empty spaces */
+}
+
+/* EVE Robot from Wall-E movie floating above WhatsApp button */
+.eve-robot {
+    display: block;
+    width: 70px;
+    height: 84px;
+    margin-bottom: -5px; /* Sit slightly over the WhatsApp button */
+    animation: eve-float 3s infinite ease-in-out;
+    filter: drop-shadow(0 4px 12px rgba(0, 194, 255, 0.25));
+    cursor: pointer;
+    z-index: 1001;
+    pointer-events: auto; /* Re-enable pointer events for hover and click on EVE */
+}
+
+@keyframes eve-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Visor eye glow pulse */
+.eve-eye {
+    animation: eve-eye-glow 2s infinite ease-in-out;
+}
+
+@keyframes eve-eye-glow {
+    0%, 100% { fill: #00C2FF; opacity: 1; filter: drop-shadow(0 0 1px #00C2FF); }
+    50% { fill: #80E5FF; opacity: 0.8; filter: drop-shadow(0 0 3px #00C2FF); }
+}
+
+/* Floor shadow size reacts to floating height */
+.eve-shadow {
+    animation: eve-shadow-scale 3s infinite ease-in-out;
+    transform-origin: center;
+}
+
+@keyframes eve-shadow-scale {
+    0%, 100% { transform: scale(1); opacity: 0.15; }
+    50% { transform: scale(0.8); opacity: 0.08; }
+}
+
+/* Left Arm slightly floats */
+.eve-left-arm {
+    transform-origin: 23px 52px;
+    animation: eve-left-arm-float 6s infinite ease-in-out;
+}
+
+@keyframes eve-left-arm-float {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* Right Arm default slight floating */
+.eve-right-arm {
+    transform-origin: 77px 52px;
+    animation: eve-right-arm-float 6s infinite ease-in-out;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes eve-right-arm-float {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-5deg); }
+}
+
+/* Head tilts slightly on hover */
+.eve-head {
+    transform-origin: 50px 30px;
+    transition: transform 0.4s ease;
+}
+
+/* Interactions when container is hovered */
+.whatsapp-container:hover .eve-head {
+    transform: rotate(5deg) translateY(-1px);
+}
+
+.whatsapp-container:hover .eve-right-arm {
+    animation: eve-wave-hand 1.2s infinite ease-in-out alternate;
+}
+
+@keyframes eve-wave-hand {
+    0% { transform: rotate(-120deg); }
+    100% { transform: rotate(-145deg); }
+}
+
+/* Greeting Tooltip */
+.whatsapp-tooltip {
+    background: rgba(15, 24, 42, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--tech-border);
+    color: var(--white);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 12px;
+    box-shadow: 0 8px 32px rgba(0, 194, 255, 0.15);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    position: relative;
+}
+
+/* Speech bubble arrow */
+.whatsapp-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    background: rgba(15, 24, 42, 0.85);
+    border-right: 1px solid var(--tech-border);
+    border-bottom: 1px solid var(--tech-border);
+}
+
+.whatsapp-container:hover .whatsapp-tooltip {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Classic Solid Green WhatsApp Floating Button */
+.whatsapp-float {
+    width: 60px;
+    height: 60px;
+    background-color: #25D366;
+    color: #FFFFFF !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    /* Limit transition properties to prevent bitmap scaling blurriness */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s, box-shadow 0.3s;
+    text-decoration: none;
+    pointer-events: auto; /* Re-enable pointer events for clicking the button */
+    
+    /* Hardware acceleration & anti-aliasing fixes to ensure maximum sharpness */
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1) translate3d(0, 0, 0);
+    background-color: #20BA5A;
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.45);
+}
+
+.whatsapp-float svg {
+    width: 34px;
+    height: 34px;
+    fill: #FFFFFF;
+    /* Enforce crisp edge rendering for SVGs in browser */
+    shape-rendering: geometricPrecision;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+/* Status Colors and Badges */
+:root {
+    --color-pendiente: #FFC107; /* Amarillo / Naranja */
+    --color-en-tramite: #0A84FF; /* Azul */
+    --color-resuelta: #69F0AE; /* Verde */
+}
+
+.badge-pendiente {
+    background: rgba(255, 193, 7, 0.1) !important;
+    color: var(--color-pendiente) !important;
+    border: 1px solid var(--color-pendiente) !important;
+}
+
+.badge-en-tramite {
+    background: rgba(10, 132, 255, 0.1) !important;
+    color: var(--color-en-tramite) !important;
+    border: 1px solid var(--color-en-tramite) !important;
+}
+
+.badge-resuelta {
+    background: rgba(105, 240, 174, 0.1) !important;
+    color: var(--color-resuelta) !important;
+    border: 1px solid var(--color-resuelta) !important;
+}
+
+/* Status selection style inside table */
+.tech-status-select {
+    background: rgba(15, 24, 42, 0.95);
+    color: var(--white);
+    border: 1px solid var(--tech-border);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 2px;
+    outline: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.tech-status-select:focus {
+    border-color: var(--tech-cyan);
+    box-shadow: 0 0 5px rgba(0, 194, 255, 0.4);
+}
+.tech-status-select option {
+    background: var(--tech-bg);
+    color: var(--white);
+}
+
+/* Ajustes adicionales de responsividad y optimización móvil */
+@media (max-width: 768px) {
+    /* Evitar desbordamiento por el título del banner principal */
+    .hero-title {
+        font-size: clamp(2rem, 8.5vw, 3.5rem) !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        display: block !important;
+    }
+    
+    .hero-section {
+        padding: 120px 0 60px 0 !important;
+        min-height: auto !important;
+    }
+    
+    /* Optimizar espaciado en grilla de servicios en pantallas móviles */
+    .grid-service-item {
+        padding: 35px 25px !important;
+        min-height: auto !important;
+    }
+    
+    /* Optimizar espaciado del formulario de PQRS y cotizaciones */
+    .pqrs-container-accenture {
+        padding: 30px 20px !important;
+    }
+    
+    /* Reubicar ligeramente el asistente virtual de WhatsApp */
+    .whatsapp-container {
+        bottom: 20px !important;
+        right: 20px !important;
+    }
+}
+
+/* XCOLNET Core Design Utilities */
+.glass {
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.75);
+    border: 0.5px solid #E5E7EB;
+}
+
+.section-padding {
+    padding-top: 96px;
+    padding-bottom: 96px;
+}
+
+@keyframes subtle-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.float-anim {
+    animation: subtle-float 6s ease-in-out infinite;
+}
+
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined' !important;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    vertical-align: middle;
+    text-transform: none !important;
+    width: 1em;
+    height: 1em;
+    overflow: hidden;
+    white-space: nowrap;
+    
+    /* Ocultar por defecto para evitar texto plano (FOUT) */
+    font-size: 0px !important;
+}
+
+/* Mostrar solo cuando la fuente esté cargada */
+.material-symbols-loaded .material-symbols-outlined {
+    font-size: inherit !important;
+}
+
+/* Infinite Marquee Left Animation for Partner Companies */
+.marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    width: 100%;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.marquee-content {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    width: max-content;
+    animation: marquee-left 25s linear infinite;
+}
+
+.marquee-container:hover .marquee-content {
+    animation-play-state: paused;
+}
+
+@keyframes marquee-left {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}

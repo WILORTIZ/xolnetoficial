@@ -1,0 +1,26 @@
+# Certificados SSL y Claves Privadas (¡No subir por seguridad!)
+*.key
+*.crt
+*.pem
+
+# Archivos comprimidos y releases
+*.zip
+*.rar
+
+# Capturas de pantalla temporales en la raíz
+/*.PNG
+/*.png
+/*.webp
+
+# Scripts de prueba y depuración locales
+test_*.py
+acme_*.py
+debug_*.php
+*.log
+
+# Carpetas del IDE y temporales
+.gemini/
+.agents/
+.vscode/
+.idea/
+node_modules/

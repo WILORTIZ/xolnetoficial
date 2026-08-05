@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>xcolnet | Integración Tecnológica e Infraestructura de Red</title>
+<!-- Google Fonts: Geist for headlines/mono, Inter for body -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#d9dff5",
+                    "secondary-fixed-dim": "#c0c6db",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#2e303a",
+                    "surface-container-low": "#f2f3ff",
+                    "surface-container-high": "#e6e7f4",
+                    "on-error": "#ffffff",
+                    "tertiary": "#a33200",
+                    "on-tertiary-container": "#fff6f4",
+                    "background": "#faf8ff",
+                    "primary-container": "#0066ff",
+                    "on-tertiary-fixed-variant": "#832600",
+                    "outline": "#727687",
+                    "on-surface": "#191b24",
+                    "inverse-primary": "#b3c5ff",
+                    "tertiary-fixed": "#ffdbd0",
+                    "on-secondary-container": "#5c6274",
+                    "surface-bright": "#faf8ff",
+                    "surface-container": "#ecedfa",
+                    "secondary-fixed": "#dce2f7",
+                    "inverse-on-surface": "#eff0fd",
+                    "primary-fixed": "#dae1ff",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#001849",
+                    "surface-container-highest": "#e1e2ee",
+                    "on-secondary-fixed": "#141b2b",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb59d",
+                    "outline-variant": "#c2c6d8",
+                    "on-primary-fixed-variant": "#003fa4",
+                    "on-background": "#191b24",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#404758",
+                    "on-primary": "#ffffff",
+                    "surface": "#faf8ff",
+                    "on-error-container": "#93000a",
+                    "on-primary-container": "#f8f7ff",
+                    "secondary": "#575e70",
+                    "surface-variant": "#e1e2ee",
+                    "primary": "#0050cb",
+                    "tertiary-container": "#cc4204",
+                    "on-tertiary-fixed": "#390c00",
+                    "surface-tint": "#0054d6",
+                    "on-surface-variant": "#424656",
+                    "surface-dim": "#d8d9e6",
+                    "primary-fixed-dim": "#b3c5ff",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "rail-wide": "auto",
+                    "margin-desktop": "64px",
+                    "margin-mobile": "20px",
+                    "container-max": "1280px",
+                    "gutter": "24px",
+                    "rail-narrow": "280px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "mono": ["Geist"],
+                    "headline-lg-mobile": ["Geist"],
+                    "display": ["Geist"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Geist"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+                    "mono": ["13px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "display": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.7);
+            border: 0.5px solid #E5E7EB;
+        }
+        .section-padding {
+            padding-top: 96px;
+            padding-bottom: 96px;
+        }
+        @keyframes subtle-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .float-anim {
+            animation: subtle-float 6s ease-in-out infinite;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-outline-variant/30">
+<nav class="flex justify-between items-center max-w-container-max mx-auto px-margin-desktop h-16">
+<div class="flex items-center gap-12">
+<a class="font-headline-md text-headline-md font-bold tracking-tight text-on-surface" href="#">xcolnet</a>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Inicio</a>
+<div class="relative group">
+<button class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200 flex items-center gap-1">
+        Soluciones
+        <span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+<div class="absolute top-full left-0 mt-2 w-56 glass rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-2 border border-outline-variant/30">
+<a class="block p-2 hover:bg-primary/5 rounded text-body-md" href="#">Cableado Estructurado</a>
+<a class="block p-2 hover:bg-primary/5 rounded text-body-md" href="#">Networking &amp; Redes</a>
+<a class="block p-2 hover:bg-primary/5 rounded text-body-md" href="#">Seguridad Electrónica</a>
+<a class="block p-2 hover:bg-primary/5 rounded text-body-md" href="#">Mantenimiento &amp; Soporte</a>
+</div>
+</div>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Soporte</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-6 py-2 bg-on-surface text-surface font-label-md text-label-md rounded-lg active:scale-95 transition-transform">Iniciar Sesión</button>
+</div>
+</nav>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden bg-surface">
+<div class="max-w-container-max mx-auto px-margin-desktop flex flex-col md:flex-row items-center gap-16 relative z-10">
+<div class="flex-1 text-left">
+<h1 class="font-display text-display mb-6">Integración Tecnológica e <span class="text-primary">Infraestructura de Red</span> de Alto Nivel</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-10 leading-relaxed">
+                    Soluciones integrales en conectividad, infraestructura física y seguridad electrónica para la transformación digital de su empresa.
+                </p>
+<div class="flex flex-wrap gap-4">
+<button class="px-8 py-4 bg-primary text-surface font-label-md text-headline-md rounded-lg hover:brightness-110 active:scale-95 transition-all">Solicitar Presupuesto</button>
+<button class="px-8 py-4 bg-white border-[0.5px] border-outline-variant text-on-surface font-label-md text-headline-md rounded-lg hover:bg-surface-container-low active:scale-95 transition-all">Nuestros Servicios</button>
+</div>
+</div>
+<div class="flex-1 w-full relative h-[500px]">
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-full max-w-lg glass rounded-xl p-8 float-anim shadow-2xl relative border-outline-variant/40">
+<div class="flex items-center justify-between mb-8">
+<div class="flex gap-2">
+<div class="w-3 h-3 rounded-full bg-error/40"></div>
+<div class="w-3 h-3 rounded-full bg-tertiary/40"></div>
+<div class="w-3 h-3 rounded-full bg-primary/40"></div>
+</div>
+<div class="font-mono text-label-md text-on-surface-variant bg-surface-container rounded px-2 py-1">red_estado: operativa</div>
+</div>
+<div class="space-y-6">
+<div class="h-[0.5px] bg-outline-variant/30 w-full"></div>
+<div class="flex justify-between items-end">
+<div class="space-y-2">
+<p class="font-label-md text-label-md text-outline uppercase">Disponibilidad del Nodo</p>
+<p class="font-headline-lg text-headline-lg font-bold">99.98%</p>
+</div>
+<div class="flex gap-1 h-12 items-end">
+<div class="w-2 h-10 bg-primary/40 rounded-t-sm"></div>
+<div class="w-2 h-12 bg-primary/60 rounded-t-sm"></div>
+<div class="w-2 h-12 bg-primary rounded-t-sm"></div>
+<div class="w-2 h-12 bg-primary rounded-t-sm"></div>
+<div class="w-2 h-12 bg-primary/90 rounded-t-sm"></div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center bg-surface-container-low p-3 rounded border-[0.5px] border-outline-variant/20">
+<span class="font-mono text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">settings_input_component</span>
+                                        rack_principal_central
+                                    </span>
+<span class="text-primary font-bold text-label-md">CERTIFICADO</span>
+</div>
+<div class="flex justify-between items-center bg-surface-container-low p-3 rounded border-[0.5px] border-outline-variant/20">
+<span class="font-mono text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">videocam</span>
+                                        monitoreo_cctv_ia
+                                    </span>
+<span class="text-primary font-bold text-label-md">ACTIVO</span>
+</div>
+</div>
+</div>
+<div class="absolute -z-10 -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-[80px]"></div>
+<div class="absolute -z-10 -bottom-20 -left-20 w-64 h-64 bg-secondary-container/20 rounded-full blur-[80px]"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trust Strip -->
+<section class="py-12 border-y border-outline-variant/10 bg-white">
+<div class="max-w-container-max mx-auto px-margin-desktop flex flex-wrap justify-center md:justify-between items-center gap-12 opacity-40 grayscale">
+<span class="font-headline-md text-headline-md font-bold tracking-widest">EMPRESA_A</span>
+<span class="font-headline-md text-headline-md font-extrabold italic">TECH_CORP</span>
+<span class="font-headline-md text-headline-md font-bold uppercase">GLOBAL_NET</span>
+<span class="font-headline-md text-headline-md font-medium">SYSTEMS</span>
+<span class="font-headline-md text-headline-md font-light tracking-tighter">DATA_HUB</span>
+<span class="font-headline-md text-headline-md font-bold">INFRA_STRUC</span>
+</div>
+</section>
+<!-- Core Capabilities Section -->
+<section class="section-padding bg-surface-container-lowest" id="capacidades">
+<div class="max-w-container-max mx-auto px-margin-desktop">
+<div class="mb-16">
+<span class="font-label-md text-label-md text-primary uppercase tracking-[0.2em] mb-4 block">Nuestros Pilares de Servicio</span>
+<h2 class="font-headline-lg text-headline-lg max-w-2xl">Sistemas integrales diseñados para durabilidad, cumplimiento normativo y alto rendimiento.</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Pillar 1: Cableado Estructurado -->
+<div class="bg-white border-[0.5px] border-outline-variant/30 rounded-xl p-8 hover:border-primary/50 transition-all group shadow-sm hover:shadow-md">
+<div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">settings_input_hdmi</span>
+</div>
+<h3 class="font-headline-md text-[20px] mb-3">Cableado Estructurado</h3>
+<p class="text-on-surface-variant font-body-md mb-6">Certificación de redes Cat 6, 6A y 7. Organización profesional de racks y peinado de cables.</p>
+<ul class="space-y-2 font-label-md text-on-surface/80">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[16px]">check</span> Certificación de Enlaces</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[16px]">check</span> Gestión de Gabinetes</li>
+</ul>
+</div>
+<!-- Pillar 2: Networking & Redes -->
+<div class="bg-white border-[0.5px] border-outline-variant/30 rounded-xl p-8 hover:border-primary/50 transition-all group shadow-sm hover:shadow-md">
+<div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">router</span>
+</div>
+<h3 class="font-headline-md text-[20px] mb-3">Networking &amp; Redes</h3>
+<p class="text-on-surface-variant font-body-md mb-6">Gestión inteligente de tráfico, switching y routing corporativo (Cisco, Aruba, MikroTik).</p>
+<ul class="space-y-2 font-label-md text-on-surface/80">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[16px]">check</span> Alta Disponibilidad</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[16px]">check</span> Wi-Fi Gestionado</li>
+</ul>
+</div>
+<!-- Pillar 3: Seguridad Electrónica -->
+<div class="bg-white border-[0.5px] border-outline-variant/30 rounded-xl p-8 hover:border-primary/50 transition-all group shadow-sm hover:shadow-md">
+<div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">shield_person</span>
+</div>
+<h3 class="font-headline-md text-[20px] mb-3">Seguridad Electrónica</h3>
+<p class="text-on-surface-variant font-body-md mb-6">Sistemas CCTV IP con analítica, control de acceso biométrico y alarmas de intrusión.</p>
+<ul class="space-y-2 font-label-md text-on-surface/80">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[16px]">check</span> Analítica de Video</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[16px]">check</span> Control Biométrico</li>
+</ul>
+</div>
+<!-- Pillar 4: Mantenimiento & Soporte -->
+<div class="bg-white border-[0.5px] border-outline-variant/30 rounded-xl p-8 hover:border-primary/50 transition-all group shadow-sm hover:shadow-md">
+<div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">support_agent</span>
+</div>
+<h3 class="font-headline-md text-[20px] mb-3">Mantenimiento &amp; Soporte</h3>
+<p class="text-on-surface-variant font-body-md mb-6">Soporte técnico 24/7 y planes de mantenimiento proactivo para asegurar continuidad operativa.</p>
+<ul class="space-y-2 font-label-md text-on-surface/80">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[16px]">check</span> Help Desk 24/7</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[16px]">check</span> Gestión Proactiva</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- Product Showcase (Physical Infrastructure Control) -->
+<section class="section-padding bg-surface overflow-hidden">
+<div class="max-w-container-max mx-auto px-margin-desktop text-center mb-16">
+<span class="font-label-md text-label-md text-primary uppercase tracking-[0.2em] mb-4 block">Operaciones Técnicas</span>
+<h2 class="font-headline-lg text-headline-lg mb-6">Control total de su infraestructura física</h2>
+<p class="text-on-surface-variant font-body-lg max-w-2xl mx-auto">Gestione sus nodos de red, sistemas de seguridad y protocolos de mantenimiento desde un único centro de comando local.</p>
+</div>
+<div class="max-w-container-max mx-auto px-margin-desktop">
+<div class="glass rounded-xl shadow-[0_40px_100px_rgba(0,0,0,0.08)] overflow-hidden border-outline-variant/50">
+<!-- Dashboard Header -->
+<div class="bg-surface-container-highest/50 px-6 py-3 border-b border-outline-variant/30 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant"></div>
+</div>
+<div class="h-4 w-[0.5px] bg-outline-variant/40 mx-2"></div>
+<div class="flex items-center gap-2 font-mono text-label-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+                            xcolnet_infra_monitor — centro de control físico
+                        </div>
+</div>
+<div class="flex items-center gap-4">
+<div class="px-3 py-1 bg-primary/10 text-primary rounded-full text-label-md font-mono">Conexión Local Estable</div>
+</div>
+</div>
+<!-- Dashboard Content -->
+<div class="flex flex-col md:flex-row h-[500px]">
+<!-- Sidebar Rail -->
+<div class="w-64 border-r border-outline-variant/20 bg-surface-container-low/30 hidden md:block p-6">
+<div class="space-y-6 text-left">
+<div class="space-y-2">
+<p class="font-label-md text-label-md text-outline uppercase tracking-wider">Infraestructura</p>
+<div class="p-2 rounded bg-primary-container/10 text-primary font-medium flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">lan</span>Estado de Red
+</div>
+<div class="p-2 rounded hover:bg-surface-container transition-colors flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">settings_ethernet</span>Conectividad Física
+</div>
+</div>
+<div class="space-y-2 pt-4">
+<p class="font-label-md text-label-md text-outline uppercase tracking-wider">Seguridad</p>
+<div class="p-2 rounded hover:bg-surface-container transition-colors flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+                                    Cámaras CCTV
+                                </div>
+<div class="p-2 rounded hover:bg-surface-container transition-colors flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">lock_open</span>
+                                    Accesos Biométricos
+                                </div>
+</div>
+</div>
+</div>
+<!-- Canvas Area -->
+<div class="flex-1 p-8 overflow-y-auto text-left">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+<div class="bg-white border-[0.5px] border-outline-variant/30 rounded-lg p-6">
+<p class="font-label-md text-label-md text-outline mb-1">ESTADO DE RED (LATENCIA)</p>
+<p class="font-headline-md text-headline-md font-bold mb-4">12ms Promedio</p>
+<div class="h-24 w-full bg-surface-container-low rounded flex items-end gap-1 px-2 py-1">
+<div class="flex-1 bg-primary h-[40%]"></div>
+<div class="flex-1 bg-primary h-[35%]"></div>
+<div class="flex-1 bg-primary h-[45%]"></div>
+<div class="flex-1 bg-primary h-[30%]"></div>
+<div class="flex-1 bg-primary h-[38%]"></div>
+<div class="flex-1 bg-primary h-[42%]"></div>
+<div class="flex-1 bg-primary h-[35%]"></div>
+</div>
+</div>
+<div class="bg-white border-[0.5px] border-outline-variant/30 rounded-lg p-6">
+<p class="font-label-md text-label-md text-outline mb-1">ACCESOS BIOMÉTRICOS</p>
+<p class="font-headline-md text-headline-md font-bold mb-4">84 Entradas / Hoy</p>
+<div class="h-24 w-full bg-surface-container-low rounded overflow-hidden relative">
+<svg class="absolute bottom-0 w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40">
+<path class="text-primary" d="M0 35 L10 32 L20 38 L30 25 L40 30 L50 15 L60 25 L70 20 L80 32 L90 28 L100 35 L100 40 L0 40 Z" fill="rgba(0,102,255,0.1)" stroke="currentColor" stroke-width="1.5"></path>
+</svg>
+</div>
+</div>
+</div>
+<div class="bg-[#111827] rounded-lg p-6 font-mono text-surface text-label-md leading-relaxed overflow-hidden">
+<p class="text-secondary-fixed-dim opacity-50 mb-2">// Verificando integridad de capa física...</p>
+<p class="text-primary-fixed mb-1"><span class="text-tertiary-fixed-dim">$</span> xcol-net --check-connectivity</p>
+<p class="text-surface mb-1">Verificando certificación de enlaces de cobre Cat6A...</p>
+<p class="text-primary-fixed-dim mb-1">Escaneando estado de switches en core principal [██████████████] 100%</p>
+<p class="text-surface mb-1">Estado de enlaces troncales: OK | Sincronización: ACTIVA</p>
+<p class="text-secondary-fixed mb-1">Reporte de conectividad física generado localmente en /var/logs/xcolnet/network_report.pdf</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="section-padding bg-surface" id="testimonios">
+<div class="max-w-container-max mx-auto px-margin-desktop">
+<div class="text-center mb-16">
+<span class="font-label-md text-label-md text-primary uppercase tracking-[0.2em] mb-4 block">CLIENTES SATISFECHOS</span>
+<h2 class="font-headline-lg text-headline-lg">Confianza respaldada por resultados reales</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Testimonial 1 -->
+<div class="bg-white border-[0.5px] border-outline-variant/30 rounded-xl p-8 shadow-sm hover:shadow-md transition-all">
+<div class="flex gap-1 mb-4 text-primary">
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+</div>
+<p class="text-on-surface-variant font-body-md mb-6 italic">"La certificación de nuestro cableado estructurado fue impecable. El orden y la documentación técnica superaron nuestras expectativas."</p>
+<div>
+<p class="font-bold text-on-surface">Carlos Mendoza</p>
+<p class="text-label-md text-outline">Director de IT, TechCorp</p>
+</div>
+</div>
+<!-- Testimonial 2 -->
+<div class="bg-white border-[0.5px] border-outline-variant/30 rounded-xl p-8 shadow-sm hover:shadow-md transition-all">
+<div class="flex gap-1 mb-4 text-primary">
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+</div>
+<p class="text-on-surface-variant font-body-md mb-6 italic">"Gracias a xcolnet, nuestra red Wi-Fi corporativa ahora es estable y segura. El soporte técnico 24/7 es realmente proactivo."</p>
+<div>
+<p class="font-bold text-on-surface">Elena Rodríguez</p>
+<p class="text-label-md text-outline">Gerente de Operaciones, Global Net</p>
+</div>
+</div>
+<!-- Testimonial 3 -->
+<div class="bg-white border-[0.5px] border-outline-variant/30 rounded-xl p-8 shadow-sm hover:shadow-md transition-all">
+<div class="flex gap-1 mb-4 text-primary">
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="material-symbols-outlined text-[20px]">star</span>
+</div>
+<p class="text-on-surface-variant font-body-md mb-6 italic">"El sistema de control biométrico y CCTV integrado nos ha dado una tranquilidad total sobre la seguridad de nuestros nodos."</p>
+<div>
+<p class="font-bold text-on-surface">Ricardo Silva</p>
+<p class="text-label-md text-outline">Jefe de Infraestructura, Data Hub</p>
+</div>
+</div>
+</div>
+</div>
+</section><section class="section-padding bg-surface-container-highest">
+<div class="max-w-container-max mx-auto px-margin-desktop text-center">
+<div class="max-w-3xl mx-auto space-y-8">
+<h2 class="font-display text-display">¿Listo para fortalecer su infraestructura?</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Únase a las empresas que confían su conectividad crítica a xcolnet. Soluciones robustas y soporte técnico de primer nivel.</p>
+<div class="flex flex-col md:flex-row items-center justify-center gap-6 pt-4">
+<button class="w-full md:w-auto px-10 py-5 bg-on-surface text-surface font-headline-md text-headline-md rounded-lg active:scale-95 transition-all shadow-xl shadow-on-surface/10">Hablar con un experto</button>
+<a class="font-label-md text-headline-md text-primary flex items-center gap-2 group" href="#">
+                        Ver portafolio de proyectos
+                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+<div class="pt-12 flex justify-center items-center gap-8 text-outline">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span class="text-label-md">Instalaciones Certificadas</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">engineering</span>
+<span class="text-label-md">Soporte Técnico 24/7</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-transparent border-t border-outline-variant/20">
+<div class="flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto px-margin-desktop gap-gutter">
+<div class="flex flex-col items-center md:items-start gap-4">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">xcolnet</span>
+<p class="font-label-md text-label-md text-on-surface-variant/70">© 2024 xcolnet technology. Infraestructura y Redes.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Privacidad</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Términos</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Certificaciones</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Portal Soporte</a>
+</div>
+<div class="flex gap-4">
+<button aria-label="LinkedIn" class="w-10 h-10 flex items-center justify-center rounded-full border border-outline-variant/30 opacity-80 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-[20px]">lan</span>
+</button>
+<button aria-label="Redes" class="w-10 h-10 flex items-center justify-center rounded-full border border-outline-variant/30 opacity-80 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined text-[20px]">hub</span>
+</button>
+</div>
+</div>
+</footer>
+<script>
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        if (window.scrollY > 20) {
+            header.classList.add('shadow-sm');
+            header.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
+        } else {
+            header.classList.remove('shadow-sm');
+            header.style.backgroundColor = 'rgba(250, 248, 255, 0.7)';
+        }
+    });
+</script>
+</body></html>
