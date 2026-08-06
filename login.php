@@ -52,49 +52,58 @@ function verify_aspnet_hash($password, $hashedPassword) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $usernameOrEmail = trim($_POST['usernameOrEmail'] ?? '');
-    $password = trim($_POST['password'] ?? '');
-
-    if (empty($usernameOrEmail) || empty($password)) {
-        $errorMessage = "El usuario/correo y la contraseña son obligatorios.";
+    // Validar token Anti-CSRF
+    $postedToken = $_POST['csrf_token'] ?? '';
+    if (empty($postedToken) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $postedToken)) {
+        $errorMessage = "Error de validación de seguridad (CSRF). Por favor recargue la página e intente nuevamente.";
     } else {
-        try {
-            if ($pdo instanceof PDO) {
-                $stmt = $pdo->prepare("
-                    SELECT u.*, r.Nombre as RolNombre 
-                    FROM Usuarios u 
-                    JOIN Roles r ON u.RolId = r.Id 
-                    WHERE u.Username = ? OR u.Email = ?
-                ");
-                $stmt->execute([$usernameOrEmail, $usernameOrEmail]);
-                $user = $stmt->fetch();
-                
-                if ($user) {
-                    $user_password_hash = $user['PasswordHash'] ?? $user['passwordhash'] ?? '';
-                    $user_id = $user['Id'] ?? $user['id'] ?? 0;
-                    $user_username = $user['Username'] ?? $user['username'] ?? '';
-                    $user_email = $user['Email'] ?? $user['email'] ?? '';
-                    $user_rol_nombre = $user['RolNombre'] ?? $user['rolnombre'] ?? '';
+        $usernameOrEmail = trim($_POST['usernameOrEmail'] ?? '');
+        $password = trim($_POST['password'] ?? '');
 
-                    if (verify_aspnet_hash($password, $user_password_hash)) {
-                        $_SESSION['user_id'] = $user_id;
-                        $_SESSION['username'] = $user_username;
-                        $_SESSION['email'] = $user_email;
-                        $_SESSION['role'] = $user_rol_nombre;
-                        
-                        header("Location: index.php");
-                        exit;
+        if (empty($usernameOrEmail) || empty($password)) {
+            $errorMessage = "El usuario/correo y la contraseña son obligatorios.";
+        } else {
+            try {
+                if ($pdo instanceof PDO) {
+                    $stmt = $pdo->prepare("
+                        SELECT u.*, r.Nombre as RolNombre 
+                        FROM Usuarios u 
+                        JOIN Roles r ON u.RolId = r.Id 
+                        WHERE u.Username = ? OR u.Email = ?
+                    ");
+                    $stmt->execute([$usernameOrEmail, $usernameOrEmail]);
+                    $user = $stmt->fetch();
+                    
+                    if ($user) {
+                        $user_password_hash = $user['PasswordHash'] ?? $user['passwordhash'] ?? '';
+                        $user_id = $user['Id'] ?? $user['id'] ?? 0;
+                        $user_username = $user['Username'] ?? $user['username'] ?? '';
+                        $user_email = $user['Email'] ?? $user['email'] ?? '';
+                        $user_rol_nombre = $user['RolNombre'] ?? $user['rolnombre'] ?? '';
+
+                        if (verify_aspnet_hash($password, $user_password_hash)) {
+                            // Mitigar Session Fixation
+                            session_regenerate_id(true);
+                            $_SESSION['user_id'] = $user_id;
+                            $_SESSION['username'] = $user_username;
+                            $_SESSION['email'] = $user_email;
+                            $_SESSION['role'] = $user_rol_nombre;
+                            
+                            header("Location: index.php");
+                            exit;
+                        } else {
+                            $errorMessage = "Credenciales incorrectas.";
+                        }
                     } else {
                         $errorMessage = "Credenciales incorrectas.";
                     }
                 } else {
-                    $errorMessage = "Credenciales incorrectas.";
+                    $errorMessage = "No se pudo conectar a la base de datos MySQL.";
                 }
-            } else {
-                $errorMessage = "No se pudo conectar a la base de datos MySQL.";
+            } catch (PDOException $e) {
+                error_log("Error en login.php: " . $e->getMessage());
+                $errorMessage = "Error en el servidor al intentar iniciar sesión. Intente más tarde.";
             }
-        } catch (PDOException $e) {
-            $errorMessage = "Error en el servidor al intentar iniciar sesión: " . $e->getMessage();
         }
     }
 }
@@ -131,12 +140,13 @@ include 'header.php';
 
             <?php if (!empty($errorMessage)): ?>
                 <div class="mb-6 p-4 bg-error/10 border border-error/30 text-error rounded-lg text-sm text-center flex items-center justify-center gap-2 font-medium">
-                    <span class="material-symbols-outlined text-[18px]">warning</span>
+                    <svg class="w-4 h-4 text-error shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                     <?php echo $errorMessage; ?>
                 </div>
             <?php endif; ?>
 
             <form action="login.php" method="post" class="space-y-5">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>" />
                 <div class="space-y-1.5 text-left">
                     <label for="usernameOrEmail" class="font-label-md text-xs font-semibold uppercase tracking-wider text-outline">Usuario o Correo Electrónico</label>
                     <input type="text" id="usernameOrEmail" name="usernameOrEmail" class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/40 rounded-lg text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-body-md" placeholder="Ingresa tu usuario o email" required value="<?php echo isset($_POST['usernameOrEmail']) ? htmlspecialchars($_POST['usernameOrEmail']) : ''; ?>" />

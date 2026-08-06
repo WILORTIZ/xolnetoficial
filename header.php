@@ -1,6 +1,25 @@
 <?php
+// Cabeceras HTTP de Seguridad (OWASP Mitigation)
+header("X-Frame-Options: SAMEORIGIN");
+header("X-Content-Type-Options: nosniff");
+header("Referrer-Policy: strict-origin-when-cross-origin");
+
 if (session_status() == PHP_SESSION_NONE) {
+    $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => '',
+        'secure' => $isSecure,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
     session_start();
+}
+
+// Generar Token Anti-CSRF si no existe en la sesión
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // Determinar el título de la página si no se define antes
@@ -18,6 +37,11 @@ $userRole = $isAuthenticated ? $_SESSION['role'] : '';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><?php echo htmlspecialchars($pageTitle); ?> - XCOLNET | Soluciones Tecnológicas Integrales</title>
+    
+    <!-- Favicon / Icono de la Pestaña -->
+    <link rel="icon" type="image/png" href="favicon.png?v=2" />
+    <link rel="shortcut icon" href="favicon.png?v=2" type="image/png" />
+    <link rel="apple-touch-icon" href="favicon.png?v=2" />
     
     <!-- Google Fonts: Geist for headlines/mono, Inter for body -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -175,12 +199,12 @@ $userRole = $isAuthenticated ? $_SESSION['role'] : '';
                         </button>
                         <div id="servicesDropdownMenu" class="absolute top-full left-0 mt-2 w-64 glass rounded-xl shadow-2xl opacity-0 invisible transition-all duration-200 p-2 border border-outline-variant/40 z-50">
                             <a class="flex items-center gap-2.5 p-2.5 hover:bg-primary/10 rounded-lg text-body-md text-on-surface hover:text-primary transition-colors no-underline font-medium" href="index.php#capacidades">
-                                <span class="material-symbols-outlined text-[20px] text-primary">settings_input_hdmi</span>
-                                <span>Cableado Estructurado</span>
+                                <span class="material-symbols-outlined text-[20px] text-primary">headset_mic</span>
+                                <span>Mesa de Ayuda para PYMEs</span>
                             </a>
                             <a class="flex items-center gap-2.5 p-2.5 hover:bg-primary/10 rounded-lg text-body-md text-on-surface hover:text-primary transition-colors no-underline font-medium" href="index.php#capacidades">
-                                <span class="material-symbols-outlined text-[20px] text-primary">router</span>
-                                <span>Networking &amp; Redes</span>
+                                <span class="material-symbols-outlined text-[20px] text-primary">code</span>
+                                <span>Diseño Web &amp; Software a Medida</span>
                             </a>
                             <a class="flex items-center gap-2.5 p-2.5 hover:bg-primary/10 rounded-lg text-body-md text-on-surface hover:text-primary transition-colors no-underline font-medium" href="index.php#capacidades">
                                 <span class="material-symbols-outlined text-[20px] text-primary">videocam</span>
@@ -193,6 +217,10 @@ $userRole = $isAuthenticated ? $_SESSION['role'] : '';
                             <a class="flex items-center gap-2.5 p-2.5 hover:bg-primary/10 rounded-lg text-body-md text-on-surface hover:text-primary transition-colors no-underline font-medium" href="proyecto.php">
                                 <span class="material-symbols-outlined text-[20px] text-primary">smart_toy</span>
                                 <span>Integración de Software &amp; IA</span>
+                            </a>
+                            <a class="flex items-center gap-2.5 p-2.5 hover:bg-primary/10 rounded-lg text-body-md text-on-surface hover:text-primary transition-colors no-underline font-medium" href="proyecto.php">
+                                <span class="material-symbols-outlined text-[20px] text-primary">mark_email_unread</span>
+                                <span>Migración de Correos &amp; Cloud</span>
                             </a>
                         </div>
                     </div>

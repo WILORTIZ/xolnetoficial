@@ -16,18 +16,24 @@ $errorMessage = "";
 
 // Actualizar estado de un proyecto si se envía formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_status') {
-    $proyectoId = trim($_POST['proyecto_id'] ?? '');
-    $nuevoEstado = trim($_POST['nuevo_estado'] ?? '');
+    $postedToken = $_POST['csrf_token'] ?? '';
+    if (empty($postedToken) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $postedToken)) {
+        $errorMessage = "Error de validación de seguridad (CSRF). Solicitud rechazada.";
+    } else {
+        $proyectoId = trim($_POST['proyecto_id'] ?? '');
+        $nuevoEstado = trim($_POST['nuevo_estado'] ?? '');
 
-    if (!empty($proyectoId) && !empty($nuevoEstado)) {
-        try {
-            if ($pdo instanceof PDO) {
-                $stmt = $pdo->prepare("UPDATE Proyectos SET Estado = ? WHERE Id = ?");
-                $stmt->execute([$nuevoEstado, $proyectoId]);
-                $successMessage = "El estado del proyecto <b>#$proyectoId</b> se ha actualizado a: <b>$nuevoEstado</b>.";
+        if (!empty($proyectoId) && !empty($nuevoEstado)) {
+            try {
+                if ($pdo instanceof PDO) {
+                    $stmt = $pdo->prepare("UPDATE Proyectos SET Estado = ? WHERE Id = ?");
+                    $stmt->execute([$nuevoEstado, $proyectoId]);
+                    $successMessage = "El estado del proyecto <b>#" . htmlspecialchars($proyectoId) . "</b> se ha actualizado a: <b>" . htmlspecialchars($nuevoEstado) . "</b>.";
+                }
+            } catch (PDOException $e) {
+                error_log("Error en admin_proyectos.php: " . $e->getMessage());
+                $errorMessage = "Error en el servidor al intentar actualizar el estado del proyecto.";
             }
-        } catch (PDOException $e) {
-            $errorMessage = "Error al actualizar el estado del proyecto: " . $e->getMessage();
         }
     }
 }
@@ -138,6 +144,7 @@ include 'header.php';
                                     </td>
                                     <td class="py-4 px-6">
                                         <form action="admin_proyectos.php" method="post" class="flex items-center gap-2">
+                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                             <input type="hidden" name="action" value="update_status">
                                             <input type="hidden" name="proyecto_id" value="<?php echo htmlspecialchars($id); ?>">
                                             <select name="nuevo_estado" onchange="this.form.submit()" class="px-3 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded text-xs text-on-surface focus:outline-none focus:border-primary">
