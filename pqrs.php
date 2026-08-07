@@ -13,21 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $postedToken = $_POST['csrf_token'] ?? '';
     if (empty($postedToken) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $postedToken)) {
         $errorMessage = "Error de validación de seguridad (CSRF). Por favor recargue e intente nuevamente.";
-<?php
-session_start();
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-require_once 'db.php';
-
-$successMessage = "";
-$errorMessage = "";
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $postedToken = $_POST['csrf_token'] ?? '';
-    if (empty($postedToken) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $postedToken)) {
-        $errorMessage = "Error de validación de seguridad (CSRF). Por favor recargue e intente nuevamente.";
     } else {
         $nombre = trim($_POST['nombre'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -44,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             try {
                 if ($pdo instanceof PDO) {
-                    $stmt = $pdo->prepare("INSERT INTO PQRS (Nombre, Email, Telefono, Tipo, Mensaje, Estado, FechaCreacion, AceptoPoliticaDatos) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt = $pdo->prepare("INSERT INTO Pqrs (Nombre, Email, Telefono, Tipo, Mensaje, Estado, FechaCreacion, AceptoPoliticaDatos) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                     $estado = "Pendiente";
                     $fecha = date('Y-m-d H:i:s');
                     $aceptoValor = 1;
