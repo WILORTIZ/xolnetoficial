@@ -393,20 +393,6 @@ if (empty($empresasMarquee)) {
     <!-- Testimonials Section (Visualización Aleatoria) -->
     <section class="section-padding bg-surface py-20" id="testimonios">
         <div class="max-w-container-max mx-auto px-4 md:px-margin-desktop">
-            <div class="text-center mb-12">
-                <span class="font-label-md text-label-md text-primary uppercase tracking-[0.2em] mb-3 block font-semibold">CLIENTES SATISFECHOS</span>
-                <h2 class="font-headline-lg text-headline-lg text-2xl md:text-4xl font-bold text-on-surface mb-6">Confianza respaldada por resultados reales</h2>
-                <div class="flex flex-wrap items-center justify-center gap-3 mb-4">
-                    <button type="button" id="openCommentModalBtn" class="px-6 py-2.5 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary/95 transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                        Dejar un Comentario
-                    </button>
-                    <button type="button" id="openAllCommentsBtn" class="px-6 py-2.5 bg-surface-container-high border border-outline-variant/40 text-on-surface font-label-md text-label-md rounded-lg hover:bg-primary hover:text-white transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
-                        <span class="material-symbols-outlined text-[18px]">forum</span>
-                        Ver Todos los Comentarios (<?php echo count($testimonios); ?>)
-                    </button>
-                </div>
-            </div>
             <?php
             // Cargar comentarios guardados de la base de datos (más recientes primero)
             $testimoniosDb = [];
@@ -450,6 +436,21 @@ if (empty($empresasMarquee)) {
             shuffle($testimoniosMezclados);
             $tandaInicial = array_slice($testimoniosMezclados, 0, 3);
             ?>
+
+            <div class="text-center mb-12">
+                <span class="font-label-md text-label-md text-primary uppercase tracking-[0.2em] mb-3 block font-semibold">CLIENTES SATISFECHOS</span>
+                <h2 class="font-headline-lg text-headline-lg text-2xl md:text-4xl font-bold text-on-surface mb-6">Confianza respaldada por resultados reales</h2>
+                <div class="flex flex-wrap items-center justify-center gap-3 mb-4">
+                    <button type="button" id="openCommentModalBtn" class="px-6 py-2.5 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary/95 transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        Dejar un Comentario
+                    </button>
+                    <button type="button" id="openAllCommentsBtn" class="px-6 py-2.5 bg-surface-container-high border border-outline-variant/40 text-on-surface font-label-md text-label-md rounded-lg hover:bg-primary hover:text-white transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
+                        <span class="material-symbols-outlined text-[18px]">forum</span>
+                        Ver Todos los Comentarios (<?php echo count($testimonios); ?>)
+                    </button>
+                </div>
+            </div>
             
             <div id="testimonios-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity duration-500 ease-in-out" style="opacity: 1;">
                 <?php foreach ($tandaInicial as $test): ?>
