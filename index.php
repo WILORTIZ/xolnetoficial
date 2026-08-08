@@ -396,13 +396,19 @@ if (empty($empresasMarquee)) {
             <div class="text-center mb-12">
                 <span class="font-label-md text-label-md text-primary uppercase tracking-[0.2em] mb-3 block font-semibold">CLIENTES SATISFECHOS</span>
                 <h2 class="font-headline-lg text-headline-lg text-2xl md:text-4xl font-bold text-on-surface mb-6">Confianza respaldada por resultados reales</h2>
-                <button type="button" id="openCommentModalBtn" class="px-6 py-2.5 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary/95 transition-all shadow-md flex items-center gap-2 mx-auto active:scale-95">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                    Dejar un Comentario
-                </button>
+                <div class="flex flex-wrap items-center justify-center gap-3 mb-4">
+                    <button type="button" id="openCommentModalBtn" class="px-6 py-2.5 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary/95 transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        Dejar un Comentario
+                    </button>
+                    <button type="button" id="openAllCommentsBtn" class="px-6 py-2.5 bg-surface-container-high border border-outline-variant/40 text-on-surface font-label-md text-label-md rounded-lg hover:bg-primary hover:text-white transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
+                        <span class="material-symbols-outlined text-[18px]">forum</span>
+                        Ver Todos los Comentarios (<?php echo count($testimonios); ?>)
+                    </button>
+                </div>
             </div>
             <?php
-            // Cargar comentarios guardados de la base de datos
+            // Cargar comentarios guardados de la base de datos (más recientes primero)
             $testimoniosDb = [];
             if ($connected && $pdo) {
                 try {
@@ -425,7 +431,7 @@ if (empty($empresasMarquee)) {
                 ['texto' => '"Su soporte técnico 24/7 resolvió un cuello de botella crítico en nuestros switches en tiempo récord. El servicio es sobresaliente."', 'nombre' => 'Fernando Rojas', 'cargo' => 'Administrador de Red, ConnectPlus', 'estrellas' => 5],
                 ['texto' => '"La instalación de alarmas y cámaras perimetrales integradas con analítica inteligente superó todos nuestros requerimientos de seguridad."', 'nombre' => 'Sofía Valenzuela', 'cargo' => 'Jefa de Seguridad, SafeCore', 'estrellas' => 5],
                 ['texto' => '"Un socio tecnológico de total confianza. Cumplieron con todos los estándares internacionales y normativos de redes en nuestra obra."', 'nombre' => 'Alejandro Castro', 'cargo' => 'Director de Proyectos, BuildCorp', 'estrellas' => 5],
-                ['texto' => '"El control de acceso por reconocimiento facial y huella dactilar ha mejorado drástirmante la seguridad de nuestras bodegas."', 'nombre' => 'Camila López', 'cargo' => 'Gerente de IT, SmartLogistics', 'estrellas' => 5],
+                ['texto' => '"El control de acceso por reconocimiento facial y huella dactilar ha mejorado drásticamente la seguridad de nuestras bodegas."', 'nombre' => 'Camila López', 'cargo' => 'Gerente de IT, SmartLogistics', 'estrellas' => 5],
                 ['texto' => '"La configuración de enlaces redundantes y alta disponibilidad de red garantizó la continuidad del negocio para nuestros clientes."', 'nombre' => 'Juan Sebastián', 'cargo' => 'Administrador de Sistemas, CloudServices', 'estrellas' => 5],
                 ['texto' => '"Nuestra cobertura Wi-Fi para huéspedes mejoró notablemente gracias a los puntos de acceso que instaló y gestiona xcolnet."', 'nombre' => 'Natalia Herrera', 'cargo' => 'Directora de Compras, Hotel Plaza', 'estrellas' => 5],
                 ['texto' => '"Implementaron un cableado estructurado impecable en todas nuestras aulas y laboratorios. Su orden al peinar cables es excelente."', 'nombre' => 'Jorge Iván Ortiz', 'cargo' => 'Coordinador de Infraestructura, EduTech', 'estrellas' => 5],
@@ -436,10 +442,10 @@ if (empty($empresasMarquee)) {
                 ['texto' => '"El servicio preventivo programado que ofrecen mantiene nuestra red de tiendas operando sin caídas de facturación."', 'nombre' => 'Sandra Milena', 'cargo' => 'Gerente de Tecnología, RetailGroup', 'estrellas' => 5]
             ];
 
-            // Combinar testimonios de la DB (más recientes primero) con los estáticos
+            // Combinar testimonios: DB (del más nuevo al más antiguo) primero, seguidos por los estáticos
             $testimonios = array_merge($testimoniosDb, $testimoniosEstaticos);
 
-            // Seleccionar 3 testimonios aleatorios iniciales
+            // Seleccionar 3 testimonios aleatorios iniciales para el carrusel de inicio
             $testimoniosMezclados = $testimonios;
             shuffle($testimoniosMezclados);
             $tandaInicial = array_slice($testimoniosMezclados, 0, 3);
@@ -462,6 +468,71 @@ if (empty($empresasMarquee)) {
                         </div>
                     </div>
                 <?php endforeach; ?>
+            </div>
+
+            <!-- Modal para ver todos los comentarios -->
+            <div id="allCommentsModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 invisible transition-all duration-300 px-4 py-6">
+                <div class="bg-white border border-outline-variant/30 max-w-3xl w-full max-h-[88vh] rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-all duration-300 flex flex-col">
+                    <!-- Modal Header -->
+                    <div class="px-6 py-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+                        <div>
+                            <h3 class="font-bold text-xl text-on-surface mb-0.5 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-[24px]">forum</span> Todos los Comentarios y Testimonios
+                            </h3>
+                            <p class="text-xs text-on-surface-variant mb-0 font-mono">Ordenados del más reciente al más antiguo (Total: <?php echo count($testimonios); ?>)</p>
+                        </div>
+                        <button type="button" id="closeAllCommentsModalBtn" class="text-outline hover:text-on-surface p-1.5 rounded-full hover:bg-surface-container transition-colors border-0 bg-transparent flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Buscador dentro del modal -->
+                    <div class="px-6 py-3 bg-surface border-b border-outline-variant/20 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-outline text-[20px]">search</span>
+                        <input type="text" id="searchAllCommentsInput" placeholder="Buscar por nombre, empresa o palabras clave..." class="w-full bg-transparent text-sm text-on-surface focus:outline-none placeholder:text-outline/70">
+                    </div>
+
+                    <!-- Lista scrollable de comentarios del más nuevo al más antiguo -->
+                    <div class="p-6 overflow-y-auto space-y-4 max-h-[60vh] bg-surface-container-low/30" id="allCommentsList">
+                        <?php foreach ($testimonios as $index => $test): ?>
+                            <div class="comment-item bg-white border border-outline-variant/30 rounded-xl p-5 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between" data-search="<?php echo htmlspecialchars(strtolower(($test['nombre'] ?? '') . ' ' . ($test['cargo'] ?? '') . ' ' . ($test['texto'] ?? ''))); ?>">
+                                <div>
+                                    <div class="flex items-center justify-between gap-2 mb-3">
+                                        <div class="flex gap-1 text-amber-400">
+                                            <?php for ($s = 0; $s < intval($test['estrellas'] ?? 5); $s++): ?>
+                                                <svg class="w-4 h-4 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <?php endfor; ?>
+                                        </div>
+                                        <?php if ($index < count($testimoniosDb)): ?>
+                                            <span class="px-2.5 py-0.5 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 text-[10px] font-mono font-bold rounded-full flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Comentario Reciente
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 text-[10px] font-mono font-medium rounded-full">
+                                                Cliente Verificado
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <p class="text-on-surface-variant font-body-md text-sm mb-4 italic leading-relaxed">
+                                        <?php echo htmlspecialchars($test['texto'] ?? ''); ?>
+                                    </p>
+                                </div>
+                                <div class="pt-3 border-t border-outline-variant/20 flex justify-between items-center">
+                                    <div>
+                                        <p class="font-bold text-on-surface text-sm mb-0"><?php echo htmlspecialchars($test['nombre'] ?? ''); ?></p>
+                                        <p class="text-xs text-outline mb-0"><?php echo htmlspecialchars($test['cargo'] ?? ''); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    
+                    <!-- Modal Footer -->
+                    <div class="px-6 py-3 border-t border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+                        <span class="text-xs text-outline font-mono">Mostrando del más reciente al más antiguo</span>
+                        <button type="button" id="closeAllCommentsModalFooterBtn" class="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-label-md font-semibold">Cerrar</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Modal para dejar comentario -->
@@ -581,7 +652,7 @@ if (empty($empresasMarquee)) {
                 
                 reiniciarIntervalo();
 
-                // Manejo de Modal
+                // Manejo de Modal Dejar Comentario
                 function openModal() {
                     commentModal.classList.remove('invisible', 'opacity-0');
                     commentModal.classList.add('visible', 'opacity-100');
@@ -603,6 +674,55 @@ if (empty($empresasMarquee)) {
                 if (openModalBtn) openModalBtn.addEventListener('click', openModal);
                 if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
                 if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+                // Manejo de Modal Ver Todos los Comentarios
+                const allCommentsModal = document.getElementById('allCommentsModal');
+                const openAllCommentsBtn = document.getElementById('openAllCommentsBtn');
+                const closeAllCommentsModalBtn = document.getElementById('closeAllCommentsModalBtn');
+                const closeAllCommentsModalFooterBtn = document.getElementById('closeAllCommentsModalFooterBtn');
+                const searchAllCommentsInput = document.getElementById('searchAllCommentsInput');
+
+                function openAllCommentsModal() {
+                    if (!allCommentsModal) return;
+                    allCommentsModal.classList.remove('invisible', 'opacity-0');
+                    allCommentsModal.classList.add('visible', 'opacity-100');
+                    allCommentsModal.firstElementChild.classList.remove('scale-95');
+                    allCommentsModal.firstElementChild.classList.add('scale-100');
+                    clearInterval(rotarInterval);
+                }
+
+                function closeAllCommentsModal() {
+                    if (!allCommentsModal) return;
+                    allCommentsModal.classList.remove('visible', 'opacity-100');
+                    allCommentsModal.classList.add('invisible', 'opacity-0');
+                    allCommentsModal.firstElementChild.classList.remove('scale-100');
+                    allCommentsModal.firstElementChild.classList.add('scale-95');
+                    if (searchAllCommentsInput) {
+                        searchAllCommentsInput.value = '';
+                        searchAllCommentsInput.dispatchEvent(new Event('input'));
+                    }
+                    reiniciarIntervalo();
+                }
+
+                if (openAllCommentsBtn) openAllCommentsBtn.addEventListener('click', openAllCommentsModal);
+                if (closeAllCommentsModalBtn) closeAllCommentsModalBtn.addEventListener('click', closeAllCommentsModal);
+                if (closeAllCommentsModalFooterBtn) closeAllCommentsModalFooterBtn.addEventListener('click', closeAllCommentsModal);
+
+                // Filtrado en vivo de comentarios por búsqueda
+                if (searchAllCommentsInput) {
+                    searchAllCommentsInput.addEventListener('input', function(e) {
+                        const term = e.target.value.toLowerCase().trim();
+                        const items = document.querySelectorAll('#allCommentsList .comment-item');
+                        items.forEach(item => {
+                            const searchData = item.getAttribute('data-search') || '';
+                            if (!term || searchData.includes(term)) {
+                                item.style.display = 'flex';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                    });
+                }
 
                 // Selector de estrellas
                 function setStars(rating) {
