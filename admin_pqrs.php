@@ -5,8 +5,10 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Verificar autenticación y rol de Administrador
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'Administrador') {
+$userRole = $_SESSION['role'] ?? '';
+$isAdmin = isset($_SESSION['user_id']) && (!empty($userRole) && (strtolower($userRole) === 'administrador' || strtolower($userRole) === 'admin' || strpos(strtolower($userRole), 'admin') !== false));
+
+if (!$isAdmin) {
     header("Location: login.php");
     exit;
 }
@@ -14,29 +16,48 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'Administrador
 $successMessage = "";
 $errorMessage = "";
 
+$filtro = trim($_GET['filtro'] ?? 'pendientes');
+
 // Actualizar estado de una PQRS si se envía formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_status') {
-    $pqrsId = trim($_POST['pqrs_id'] ?? '');
-    $nuevoEstado = trim($_POST['nuevo_estado'] ?? '');
+    $postedToken = $_POST['csrf_token'] ?? '';
+    if (empty($postedToken) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $postedToken)) {
+        $errorMessage = "Error de validación de seguridad (CSRF). Solicitud rechazada.";
+    } else {
+        $pqrsId = trim($_POST['pqrs_id'] ?? '');
+        $nuevoEstado = trim($_POST['nuevo_estado'] ?? '');
 
-    if (!empty($pqrsId) && !empty($nuevoEstado)) {
-        try {
-            if ($pdo instanceof PDO) {
-                $stmt = $pdo->prepare("UPDATE Pqrs SET Estado = ? WHERE Id = ?");
-                $stmt->execute([$nuevoEstado, $pqrsId]);
-                $successMessage = "El estado del radicado <b>#$pqrsId</b> se ha actualizado a: <b>$nuevoEstado</b>.";
+        if (!empty($pqrsId) && !empty($nuevoEstado)) {
+            try {
+                if ($pdo instanceof PDO) {
+                    $stmt = $pdo->prepare("UPDATE Pqrs SET Estado = ? WHERE Id = ?");
+                    $stmt->execute([$nuevoEstado, $pqrsId]);
+
+                    if ($nuevoEstado === 'Resuelto' || $nuevoEstado === 'Resuelta' || $nuevoEstado === 'Cerrado') {
+                        $successMessage = "La PQRS <b>#$pqrsId</b> se ha marcado como <b>$nuevoEstado</b> y se movió a la lista de Resueltos.";
+                    } else {
+                        $successMessage = "El estado del radicado <b>#$pqrsId</b> se actualizó a: <b>$nuevoEstado</b>.";
+                    }
+                }
+            } catch (PDOException $e) {
+                $errorMessage = "Error al actualizar el estado: " . $e->getMessage();
             }
-        } catch (PDOException $e) {
-            $errorMessage = "Error al actualizar el estado: " . $e->getMessage();
         }
     }
 }
 
-// Obtener la lista de solicitudes PQRS
+// Obtener la lista de solicitudes PQRS filtrada
 $pqrsList = [];
 try {
     if ($pdo instanceof PDO) {
-        $stmt = $pdo->query("SELECT * FROM Pqrs ORDER BY FechaCreacion DESC");
+        if ($filtro === 'resueltos') {
+            $stmt = $pdo->query("SELECT * FROM Pqrs WHERE Estado IN ('Resuelto', 'Resuelta', 'Atendido', 'Cerrado') ORDER BY FechaCreacion DESC");
+        } elseif ($filtro === 'todos') {
+            $stmt = $pdo->query("SELECT * FROM Pqrs ORDER BY FechaCreacion DESC");
+        } else {
+            // default: pendientes (activos)
+            $stmt = $pdo->query("SELECT * FROM Pqrs WHERE Estado NOT IN ('Resuelto', 'Resuelta', 'Atendido', 'Cerrado') ORDER BY FechaCreacion DESC");
+        }
         $pqrsList = $stmt->fetchAll();
     }
 } catch (PDOException $e) {
@@ -49,15 +70,24 @@ include 'header.php';
 
 <section class="py-12 md:py-20 bg-surface min-h-[85vh]">
     <div class="max-w-container-max mx-auto px-4 md:px-margin-desktop">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 border-b border-outline-variant/30 pb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-outline-variant/30 pb-6">
             <div>
                 <span class="font-mono text-label-md text-primary uppercase tracking-[0.2em] mb-1 block font-semibold">Panel de Control</span>
                 <h1 class="font-display text-2xl md:text-4xl font-bold text-on-surface mb-0">Buzón Administrativo de PQRS</h1>
             </div>
             <div class="flex items-center gap-3">
-                <span class="px-3.5 py-1.5 bg-primary/10 text-primary font-mono text-xs rounded-full border border-primary/20">
-                    Total: <?php echo count($pqrsList); ?> Solicitudes
-                </span>
+                <!-- Filtros de Estado -->
+                <div class="flex items-center gap-1.5 bg-surface-container-high/40 p-1 rounded-xl border border-outline-variant/30">
+                    <a href="admin_pqrs.php?filtro=pendientes" class="px-3.5 py-1.5 rounded-lg font-label-md text-xs font-semibold no-underline transition-all <?php echo $filtro === 'pendientes' ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:text-primary'; ?>">
+                        Pendientes / En Trámite
+                    </a>
+                    <a href="admin_pqrs.php?filtro=resueltos" class="px-3.5 py-1.5 rounded-lg font-label-md text-xs font-semibold no-underline transition-all <?php echo $filtro === 'resueltos' ? 'bg-emerald-600 text-white shadow-md' : 'text-on-surface-variant hover:text-primary'; ?>">
+                        Resueltos
+                    </a>
+                    <a href="admin_pqrs.php?filtro=todos" class="px-3.5 py-1.5 rounded-lg font-label-md text-xs font-semibold no-underline transition-all <?php echo $filtro === 'todos' ? 'bg-on-surface text-surface shadow-md' : 'text-on-surface-variant hover:text-primary'; ?>">
+                        Todos
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -86,14 +116,16 @@ include 'header.php';
                             <th class="py-4 px-6">Tipo</th>
                             <th class="py-4 px-6">Mensaje</th>
                             <th class="py-4 px-6">Estado</th>
-                            <th class="py-4 px-6">Acción</th>
+                            <th class="py-4 px-6">Cambiar Estado</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-outline-variant/20">
                         <?php if (empty($pqrsList)): ?>
                             <tr>
-                                <td colspan="7" class="py-8 px-6 text-center text-on-surface-variant font-medium">
-                                    No hay solicitudes PQRS registradas por el momento.
+                                <td colspan="7" class="py-12 px-6 text-center text-on-surface-variant font-medium">
+                                    <span class="material-symbols-outlined text-[48px] mb-2 block text-outline/60 mx-auto">mark_email_read</span>
+                                    <div class="font-semibold text-base">No hay solicitudes PQRS <?php echo $filtro === 'resueltos' ? 'resueltas' : ($filtro === 'todos' ? 'registradas' : 'pendientes'); ?> en este momento.</div>
+                                    <p class="text-xs text-outline mt-1 mb-0">Todas las consultas activas han sido atendidas.</p>
                                 </td>
                             </tr>
                         <?php else: ?>
@@ -108,7 +140,7 @@ include 'header.php';
                                 $fecha = $item['FechaCreacion'] ?? $item['fechacreacion'];
                                 
                                 $badgeClass = 'bg-amber-500/10 text-amber-600 border-amber-500/30';
-                                if ($estado === 'Resuelto') $badgeClass = 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30';
+                                if ($estado === 'Resuelto' || $estado === 'Cerrado') $badgeClass = 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30';
                                 if ($estado === 'En trámite') $badgeClass = 'bg-blue-500/10 text-blue-600 border-blue-500/30';
                             ?>
                                 <tr class="hover:bg-surface-container-low/50 transition-colors">
@@ -135,13 +167,14 @@ include 'header.php';
                                         </span>
                                     </td>
                                     <td class="py-4 px-6">
-                                        <form action="admin_pqrs.php" method="post" class="flex items-center gap-2">
+                                        <form action="admin_pqrs.php?filtro=<?php echo urlencode($filtro); ?>" method="post" class="flex items-center gap-2">
+                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                             <input type="hidden" name="action" value="update_status">
                                             <input type="hidden" name="pqrs_id" value="<?php echo htmlspecialchars($id); ?>">
-                                            <select name="nuevo_estado" onchange="this.form.submit()" class="px-3 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded text-xs text-on-surface focus:outline-none focus:border-primary">
+                                            <select name="nuevo_estado" onchange="this.form.submit()" class="px-3 py-1.5 bg-surface-container-low border border-outline-variant/40 rounded text-xs text-on-surface focus:outline-none focus:border-primary font-medium">
                                                 <option value="Pendiente" <?php echo $estado === 'Pendiente' ? 'selected' : ''; ?>>Pendiente</option>
                                                 <option value="En trámite" <?php echo $estado === 'En trámite' ? 'selected' : ''; ?>>En trámite</option>
-                                                <option value="Resuelto" <?php echo $estado === 'Resuelto' ? 'selected' : ''; ?>>Resuelto</option>
+                                                <option value="Resuelto" <?php echo ($estado === 'Resuelto' || $estado === 'Cerrado') ? 'selected' : ''; ?>>✔ Resuelto</option>
                                             </select>
                                         </form>
                                     </td>
