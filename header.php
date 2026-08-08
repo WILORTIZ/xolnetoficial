@@ -269,14 +269,53 @@ $isAdmin = $isAuthenticated && (!empty($userRole) && (strtolower($userRole) === 
                 </div>
             </div>
             
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
                 <?php if ($isAuthenticated): ?>
                     <span class="font-body-md text-on-surface-variant hidden sm:inline-block">Hola, <strong class="text-on-surface"><?php echo htmlspecialchars($username); ?></strong></span>
-                    <a href="logout.php" class="px-5 py-2 bg-error/10 text-error font-label-md text-label-md rounded-lg hover:bg-error hover:text-white transition-all no-underline">Cerrar Sesión</a>
+                    <a href="logout.php" class="px-5 py-2 bg-error/10 text-error font-label-md text-label-md rounded-lg hover:bg-error hover:text-white transition-all no-underline text-sm font-medium">Cerrar Sesión</a>
                 <?php else: ?>
-                    <a href="login.php" class="px-6 py-2 bg-on-surface text-surface font-label-md text-label-md rounded-lg hover:bg-primary transition-colors no-underline">Acceso</a>
+                    <a href="login.php" class="px-6 py-2 bg-on-surface text-surface font-label-md text-label-md rounded-lg hover:bg-primary transition-colors no-underline text-sm font-medium">Acceso</a>
                 <?php endif; ?>
+
+                <!-- Botón Menú Móvil Hamburguesa -->
+                <button id="mobileMenuBtn" type="button" class="md:hidden text-on-surface p-2 rounded-lg hover:bg-surface-container-high border border-outline-variant/30 flex items-center justify-center bg-surface-container-low" aria-label="Abrir menú">
+                    <span class="material-symbols-outlined text-[24px]" id="mobileMenuIcon">menu</span>
+                </button>
+            </div>
         </nav>
+
+        <!-- Drawer / Menú Móvil Desplegable -->
+        <div id="mobileMenuDrawer" class="md:hidden fixed inset-x-0 top-[72px] bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant/30 shadow-2xl opacity-0 invisible -translate-y-4 transition-all duration-300 z-40 px-6 py-6 space-y-3">
+            <a class="block font-body-md text-base text-on-surface hover:text-primary font-medium py-2 no-underline border-b border-outline-variant/20" href="index.php#hero">Inicio</a>
+            
+            <!-- Servicios colapsables en móvil -->
+            <div class="border-b border-outline-variant/20 pb-2">
+                <div class="font-body-md text-base text-on-surface font-semibold py-2 flex items-center justify-between cursor-pointer select-none" id="mobileServicesToggle">
+                    <span>Servicios</span>
+                    <span class="material-symbols-outlined text-[20px] transition-transform duration-200" id="mobileServicesIcon">expand_more</span>
+                </div>
+                <div id="mobileServicesList" class="hidden pl-4 py-2 space-y-2 border-l-2 border-primary/30 my-1">
+                    <a class="block text-sm text-on-surface-variant hover:text-primary no-underline font-medium" href="index.php#capacidades">Mesa de Ayuda para PYMEs</a>
+                    <a class="block text-sm text-on-surface-variant hover:text-primary no-underline font-medium" href="index.php#capacidades">Diseño Web &amp; Software a Medida</a>
+                    <a class="block text-sm text-on-surface-variant hover:text-primary no-underline font-medium" href="index.php#capacidades">Seguridad Electrónica &amp; CCTV</a>
+                    <a class="block text-sm text-on-surface-variant hover:text-primary no-underline font-medium" href="index.php#capacidades">Soporte TI &amp; Mantenimiento</a>
+                    <a class="block text-sm text-on-surface-variant hover:text-primary no-underline font-medium" href="proyecto.php">Integración de Software &amp; IA</a>
+                    <a class="block text-sm text-on-surface-variant hover:text-primary no-underline font-medium" href="proyecto.php">Migración de Correos &amp; Cloud</a>
+                </div>
+            </div>
+            
+            <a class="block font-body-md text-base text-on-surface hover:text-primary font-medium py-2 no-underline border-b border-outline-variant/20" href="pqrs.php">PQRS</a>
+            <a class="block font-body-md text-base text-on-surface hover:text-primary font-medium py-2 no-underline border-b border-outline-variant/20" href="proyecto.php">Solicitar Proyecto</a>
+            
+            <?php if ($isAdmin): ?>
+                <a class="flex items-center gap-2 font-body-md text-sm text-primary font-bold py-2.5 px-3 bg-primary/10 rounded-lg no-underline mt-3" href="admin_pqrs.php">
+                    <span class="material-symbols-outlined text-[20px]">inbox</span> Buzón PQRS (Admin)
+                </a>
+                <a class="flex items-center gap-2 font-body-md text-sm text-primary font-bold py-2.5 px-3 bg-primary/10 rounded-lg no-underline" href="admin_proyectos.php">
+                    <span class="material-symbols-outlined text-[20px]">folder_managed</span> Proyectos Admin
+                </a>
+            <?php endif; ?>
+        </div>
     </header>
 
     <script>
@@ -317,6 +356,52 @@ $isAdmin = $isAuthenticated && (!empty($userRole) && (strtolower($userRole) === 
             document.addEventListener('click', function(e) {
                 if (!btn.parentElement.contains(e.target)) {
                     toggleDropdown(false);
+                }
+            });
+        }
+
+        // Lógica Menú Móvil
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const mobileDrawer = document.getElementById('mobileMenuDrawer');
+        const mobileIcon = document.getElementById('mobileMenuIcon');
+        const mobileServicesToggle = document.getElementById('mobileServicesToggle');
+        const mobileServicesList = document.getElementById('mobileServicesList');
+        const mobileServicesIcon = document.getElementById('mobileServicesIcon');
+
+        if (mobileBtn && mobileDrawer) {
+            mobileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isHidden = mobileDrawer.classList.contains('invisible');
+                if (isHidden) {
+                    mobileDrawer.classList.remove('invisible', 'opacity-0', '-translate-y-4');
+                    mobileDrawer.classList.add('visible', 'opacity-100', 'translate-y-0');
+                    if (mobileIcon) mobileIcon.textContent = 'close';
+                } else {
+                    mobileDrawer.classList.remove('visible', 'opacity-100', 'translate-y-0');
+                    mobileDrawer.classList.add('invisible', 'opacity-0', '-translate-y-4');
+                    if (mobileIcon) mobileIcon.textContent = 'menu';
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!mobileDrawer.contains(e.target) && !mobileBtn.contains(e.target)) {
+                    mobileDrawer.classList.remove('visible', 'opacity-100', 'translate-y-0');
+                    mobileDrawer.classList.add('invisible', 'opacity-0', '-translate-y-4');
+                    if (mobileIcon) mobileIcon.textContent = 'menu';
+                }
+            });
+        }
+
+        if (mobileServicesToggle && mobileServicesList) {
+            mobileServicesToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isClosed = mobileServicesList.classList.contains('hidden');
+                if (isClosed) {
+                    mobileServicesList.classList.remove('hidden');
+                    if (mobileServicesIcon) mobileServicesIcon.style.transform = 'rotate(180deg)';
+                } else {
+                    mobileServicesList.classList.add('hidden');
+                    if (mobileServicesIcon) mobileServicesIcon.style.transform = 'rotate(0deg)';
                 }
             });
         }

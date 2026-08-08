@@ -446,7 +446,7 @@ if (empty($empresasMarquee)) {
                         Dejar un Comentario
                     </button>
                     <button type="button" id="openAllCommentsBtn" class="px-6 py-2.5 bg-surface-container-high border border-outline-variant/40 text-on-surface font-label-md text-label-md rounded-lg hover:bg-primary hover:text-white transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
-                        <span class="material-symbols-outlined text-[18px]">forum</span>
+                        <svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                         Ver Todos los Comentarios (<?php echo count($testimonios); ?>)
                     </button>
                 </div>
@@ -478,7 +478,8 @@ if (empty($empresasMarquee)) {
                     <div class="px-6 py-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
                         <div>
                             <h3 class="font-bold text-xl text-on-surface mb-0.5 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-primary text-[24px]">forum</span> Todos los Comentarios y Testimonios
+                                <svg class="w-6 h-6 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                                Todos los Comentarios
                             </h3>
                             <p class="text-xs text-on-surface-variant mb-0 font-mono">Ordenados del más reciente al más antiguo (Total: <?php echo count($testimonios); ?>)</p>
                         </div>
@@ -489,7 +490,7 @@ if (empty($empresasMarquee)) {
                     
                     <!-- Buscador dentro del modal -->
                     <div class="px-6 py-3 bg-surface border-b border-outline-variant/20 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-outline text-[20px]">search</span>
+                        <svg class="w-5 h-5 text-outline shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                         <input type="text" id="searchAllCommentsInput" placeholder="Buscar por nombre, empresa o palabras clave..." class="w-full bg-transparent text-sm text-on-surface focus:outline-none placeholder:text-outline/70">
                     </div>
 
@@ -708,6 +709,11 @@ if (empty($empresasMarquee)) {
                 if (openAllCommentsBtn) openAllCommentsBtn.addEventListener('click', openAllCommentsModal);
                 if (closeAllCommentsModalBtn) closeAllCommentsModalBtn.addEventListener('click', closeAllCommentsModal);
                 if (closeAllCommentsModalFooterBtn) closeAllCommentsModalFooterBtn.addEventListener('click', closeAllCommentsModal);
+
+                // Auto-abrir modal de comentarios si viene en la URL
+                if (window.location.hash === '#allCommentsModal' || new URLSearchParams(window.location.search).get('modal') === 'comentarios') {
+                    setTimeout(openAllCommentsModal, 300);
+                }
 
                 // Filtrado en vivo de comentarios por búsqueda
                 if (searchAllCommentsInput) {
