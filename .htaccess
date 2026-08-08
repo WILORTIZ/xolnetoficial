@@ -1,12 +1,17 @@
 # Desactivar el puente de Node/Python anterior para habilitar PHP Nativo directamente
 PassengerEnabled off
 
-# Forzar la conexión segura HTTPS (excluyendo verificación y cargador temporal)
+# Configurar motor de reescritura de URLs
 RewriteEngine On
-RewriteCond %{REQUEST_URI} !^/upload_helper\.php
+
+# Excluir validaciones de seguridad y utilidades de carga
 RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteCond %{REQUEST_URI} !^/upload_helper\.php
+
+# Forzar HTTPS y redirección unificada hacia https://www.xcolnet.com/
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteRule ^(.*)$ https://www.xcolnet.com/$1 [R=301,L]
 
 # Configuración básica de reescritura para mayor seguridad y enlaces limpios
 DirectoryIndex index.php
