@@ -71,9 +71,20 @@ include 'header.php';
                         <h2 class="font-headline-lg text-xl md:text-2xl font-bold text-on-surface mb-1">Formulario de Radicación de PQRS</h2>
                         <p class="font-body-md text-on-surface-variant/80 text-sm mb-0">Completa la información requerida para dar seguimiento a tu caso.</p>
                     </div>
-                    <a href="consultar_pqrs.php" class="px-4 py-2 bg-primary/10 text-primary font-label-md text-sm rounded-lg hover:bg-primary hover:text-white transition-all no-underline font-medium flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[18px]">search</span> Consultar Radicado
-                    </a>
+                    <div class="flex items-center gap-2">
+                        <?php 
+                        $uRole = $_SESSION['role'] ?? '';
+                        $isAdminPage = isset($_SESSION['user_id']) && (!empty($uRole) && (strtolower($uRole) === 'administrador' || strtolower($uRole) === 'admin' || strpos(strtolower($uRole), 'admin') !== false));
+                        if ($isAdminPage): 
+                        ?>
+                            <a href="admin_pqrs.php" class="px-4 py-2 bg-amber-500/10 text-amber-700 font-label-md text-sm rounded-lg hover:bg-amber-500 hover:text-white transition-all no-underline font-semibold flex items-center gap-1.5 border border-amber-500/30">
+                                <span class="material-symbols-outlined text-[18px]">admin_panel_settings</span> Buzón PQRS (Admin)
+                            </a>
+                        <?php endif; ?>
+                        <a href="consultar_pqrs.php" class="px-4 py-2 bg-primary/10 text-primary font-label-md text-sm rounded-lg hover:bg-primary hover:text-white transition-all no-underline font-medium flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[18px]">search</span> Consultar Radicado
+                        </a>
+                    </div>
                 </div>
                 
                 <?php if (!empty($successMessage)): ?>

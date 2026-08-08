@@ -30,6 +30,7 @@ if (!isset($pageTitle)) {
 $isAuthenticated = isset($_SESSION['user_id']);
 $username = $isAuthenticated ? $_SESSION['username'] : '';
 $userRole = $isAuthenticated ? $_SESSION['role'] : '';
+$isAdmin = $isAuthenticated && (!empty($userRole) && (strtolower($userRole) === 'administrador' || strtolower($userRole) === 'admin' || strpos(strtolower($userRole), 'admin') !== false));
 ?>
 <!DOCTYPE html>
 <html class="light" lang="es">
@@ -256,9 +257,14 @@ $userRole = $isAuthenticated ? $_SESSION['role'] : '';
                         </div>
                     </div>
                     <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200 no-underline" href="pqrs.php">PQRS</a>
-                    <?php if ($isAuthenticated && $userRole === 'Administrador'): ?>
-                        <a class="font-body-md text-body-md text-primary font-medium hover:underline no-underline" href="admin_pqrs.php">Buzón PQRS</a>
-                        <a class="font-body-md text-body-md text-primary font-medium hover:underline no-underline" href="admin_proyectos.php">Proyectos</a>
+                    <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200 no-underline" href="proyecto.php">Solicitar Proyecto</a>
+                    <?php if ($isAdmin): ?>
+                        <a class="font-body-md text-body-md text-primary font-semibold hover:underline no-underline flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20" href="admin_pqrs.php">
+                            <span class="material-symbols-outlined text-[18px]">inbox</span> Buzón PQRS
+                        </a>
+                        <a class="font-body-md text-body-md text-primary font-semibold hover:underline no-underline flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20" href="admin_proyectos.php">
+                            <span class="material-symbols-outlined text-[18px]">folder_managed</span> Proyectos Admin
+                        </a>
                     <?php endif; ?>
                 </div>
             </div>
