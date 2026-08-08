@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin_proyectos.php
+Disallow: /admin_pqrs.php
+Disallow: /db.php
+Disallow: /upload_helper.php
+Disallow: /unzipper.php
+
+Sitemap: https://www.xcolnet.com/sitemap.xml

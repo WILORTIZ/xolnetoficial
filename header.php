@@ -38,6 +38,37 @@ $userRole = $isAuthenticated ? $_SESSION['role'] : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><?php echo htmlspecialchars($pageTitle); ?> - XCOLNET | Soluciones Tecnológicas Integrales</title>
     
+    <!-- Google SEO & Canonical Redirection Tags -->
+    <meta name="description" content="XCOLNET - Soluciones tecnológicas integrales: Mesa de Ayuda para PYMEs, Diseño Web y Software a medida, Seguridad Electrónica (CCTV IP & Biometría), Soporte TI 24/7 y Migración de Correos Cloud." />
+    <meta name="keywords" content="XCOLNET, soluciones tecnologicas, mesa de ayuda, diseño web, software a medida, soporte ti, cctv ip, seguridad electronica, migracion correos cloud" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.xcolnet.com<?php echo htmlspecialchars(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)); ?>" />
+
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="<?php echo htmlspecialchars($pageTitle); ?> - XCOLNET | Soluciones Tecnológicas Integrales" />
+    <meta property="og:description" content="Mesa de Ayuda para PYMEs, Desarrollo Web, Seguridad Electrónica, Soporte TI y Servicios Cloud en Colombia." />
+    <meta property="og:url" content="https://www.xcolnet.com<?php echo htmlspecialchars(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)); ?>" />
+    <meta property="og:image" content="https://www.xcolnet.com/images/favicon.png" />
+
+    <!-- Structured Data JSON-LD for Google Search Console -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "XCOLNET",
+      "url": "https://www.xcolnet.com",
+      "logo": "https://www.xcolnet.com/images/favicon.png",
+      "description": "Soluciones tecnológicas integrales para empresas y hogares en Colombia.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+57 317 087 7414",
+        "contactType": "customer service",
+        "areaServed": "CO"
+      }
+    }
+    </script>
+
     <!-- Favicon / Icono de la Pestaña -->
     <link rel="icon" type="image/png" href="favicon.png?v=2" />
     <link rel="shortcut icon" href="favicon.png?v=2" type="image/png" />
