@@ -33,6 +33,19 @@ $username = $_SESSION['username'] ?? $_SESSION['usuario'] ?? 'Administrador';
 $successMessage = "";
 $errorMessage = "";
 $tab = $_GET['tab'] ?? 'dashboard';
+$filtroPqrs = $_GET['filtro_pqrs'] ?? 'pendientes';
+$filtroProyectos = $_GET['filtro_proyectos'] ?? 'pendientes';
+
+// Helper para clasificar estados resueltos
+$isPqrsResuelto = function($item) {
+    $est = strtolower(get_val($item, ['Estado', 'estado'], ''));
+    return in_array($est, ['resuelto', 'resuelta', 'cerrado', 'atendido', 'completado', 'finalizado']);
+};
+
+$isProyectoResuelto = function($item) {
+    $est = strtolower(get_val($item, ['Estado', 'estado'], ''));
+    return in_array($est, ['resuelto', 'resuelta', 'completado', 'rechazado', 'cerrado', 'finalizado', 'cancelado']);
+};
 
 // Procesar acciones de PQRS
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_pqrs') {
@@ -51,7 +64,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     $stmt = $pdo->prepare("UPDATE pqrs SET Estado = ? WHERE Id = ?");
                     $stmt->execute([$nuevoEstado, $pqrsId]);
                 }
-                $successMessage = "PQRS #$pqrsId actualizada a: <b>$nuevoEstado</b>.";
+                
+                $estLow = strtolower($nuevoEstado);
+                if (in_array($estLow, ['resuelto', 'resuelta', 'cerrado', 'atendido', 'completado'])) {
+                    $successMessage = "La PQRS <b>#$pqrsId</b> se marcó como <b>$nuevoEstado</b> y se quitó de la vista de gestión activa.";
+                } else {
+                    $successMessage = "El estado de la PQRS <b>#$pqrsId</b> se actualizó a: <b>$nuevoEstado</b>.";
+                }
                 $tab = 'pqrs';
             } catch (PDOException $e) {
                 $errorMessage = "Error al actualizar PQRS: " . $e->getMessage();
@@ -77,7 +96,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     $stmt = $pdo->prepare("UPDATE proyectos SET Estado = ? WHERE Id = ?");
                     $stmt->execute([$nuevoEstado, $proyectoId]);
                 }
-                $successMessage = "Proyecto #$proyectoId actualizado a: <b>$nuevoEstado</b>.";
+
+                $estLow = strtolower($nuevoEstado);
+                if (in_array($estLow, ['resuelto', 'resuelta', 'completado', 'rechazado', 'cerrado', 'cancelado'])) {
+                    $successMessage = "El Proyecto <b>#$proyectoId</b> se marcó como <b>$nuevoEstado</b> y se quitó de la vista de gestión activa.";
+                } else {
+                    $successMessage = "El estado del Proyecto <b>#$proyectoId</b> se actualizó a: <b>$nuevoEstado</b>.";
+                }
                 $tab = 'proyectos';
             } catch (PDOException $e) {
                 $errorMessage = "Error al actualizar proyecto: " . $e->getMessage();
@@ -136,8 +161,7 @@ if ($connected && $pdo) {
     }
 
     foreach ($pqrsList as $p) {
-        $est = strtolower(get_val($p, ['Estado', 'estado'], ''));
-        if ($est === 'resuelto' || $est === 'resuelta' || $est === 'cerrado') {
+        if ($isPqrsResuelto($p)) {
             $totalPqrsResueltas++;
         } else {
             $totalPqrsPendientes++;
@@ -158,8 +182,7 @@ if ($connected && $pdo) {
     }
 
     foreach ($proyectosList as $pr) {
-        $est = strtolower(get_val($pr, ['Estado', 'estado'], ''));
-        if ($est === 'resuelto' || $est === 'completado' || $est === 'rechazado') {
+        if ($isProyectoResuelto($pr)) {
             $totalProyectosResueltos++;
         } else {
             $totalProyectosPendientes++;
@@ -169,10 +192,10 @@ if ($connected && $pdo) {
     // 3. Consulta Testimonios / Comentarios
     try {
         try {
-            $stmt = $pdo->query("SELECT * FROM testimonios ORDER BY Id DESC");
+            $stmt = $pdo->query("SELECT * FROM testimonios ORDER BY Id ASC");
             $testimoniosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $ex1) {
-            $stmt = $pdo->query("SELECT * FROM Testimonios ORDER BY Id DESC");
+            $stmt = $pdo->query("SELECT * FROM Testimonios ORDER BY Id ASC");
             $testimoniosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     } catch (PDOException $e) {
@@ -182,25 +205,29 @@ if ($connected && $pdo) {
     $totalTestimonios = count($testimoniosList);
 }
 
-$filtroPqrs = $_GET['filtro_pqrs'] ?? 'pendientes';
-$filtroProyectos = $_GET['filtro_proyectos'] ?? 'pendientes';
-
-// Filtrar PQRS
-$pqrsFiltradas = array_filter($pqrsList, function($item) use ($filtroPqrs) {
-    $est = strtolower(get_val($item, ['Estado', 'estado'], ''));
-    $isResuelto = ($est === 'resuelto' || $est === 'resuelta' || $est === 'cerrado');
-    if ($filtroPqrs === 'pendientes') return !$isResuelto;
-    if ($filtroPqrs === 'resueltos') return $isResuelto;
+// Filtrar PQRS para gestión (Si es 'pendientes', NO aparecen las resueltas)
+$pqrsFiltradas = array_filter($pqrsList, function($item) use ($filtroPqrs, $isPqrsResuelto) {
+    $resuelto = $isPqrsResuelto($item);
+    if ($filtroPqrs === 'pendientes') return !$resuelto; // Excluye resueltas
+    if ($filtroPqrs === 'resueltos') return $resuelto;
     return true;
 });
 
-// Filtrar Proyectos
-$proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroProyectos) {
-    $est = strtolower(get_val($item, ['Estado', 'estado'], ''));
-    $isResuelto = ($est === 'resuelto' || $est === 'completado' || $est === 'rechazado');
-    if ($filtroProyectos === 'pendientes') return !$isResuelto;
-    if ($filtroProyectos === 'resueltos') return $isResuelto;
+// Filtrar Proyectos para gestión (Si es 'pendientes', NO aparecen los resueltos)
+$proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroProyectos, $isProyectoResuelto) {
+    $resuelto = $isProyectoResuelto($item);
+    if ($filtroProyectos === 'pendientes') return !$resuelto; // Excluye resueltos
+    if ($filtroProyectos === 'resueltos') return $resuelto;
     return true;
+});
+
+// Para el Resumen del Dashboard General: Solo pendientes activas
+$pqrsPendientesActivas = array_filter($pqrsList, function($item) use ($isPqrsResuelto) {
+    return !$isPqrsResuelto($item);
+});
+
+$proyectosPendientesActivos = array_filter($proyectosList, function($item) use ($isProyectoResuelto) {
+    return !$isProyectoResuelto($item);
 });
 ?>
 <!DOCTYPE html>
@@ -389,19 +416,19 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                     </div>
                 </div>
 
-                <!-- Actividad reciente -->
+                <!-- Actividad reciente (Solo Pendientes Activos) -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Últimas PQRS -->
+                    <!-- Últimas PQRS Pendientes -->
                     <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5">
                         <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-base font-bold text-white mb-0">Últimas Solicitudes PQRS</h4>
-                            <a href="admin_dashboard.php?tab=pqrs" class="text-xs text-sky-400 hover:underline">Ver todas →</a>
+                            <h4 class="text-base font-bold text-white mb-0">Últimas Solicitudes PQRS Pendientes</h4>
+                            <a href="admin_dashboard.php?tab=pqrs&filtro_pqrs=pendientes" class="text-xs text-sky-400 hover:underline">Ver todas →</a>
                         </div>
                         <div class="space-y-3">
-                            <?php if (empty($pqrsList)) { ?>
-                                <p class="text-xs text-slate-400 italic">No hay PQRS registradas.</p>
+                            <?php if (empty($pqrsPendientesActivas)) { ?>
+                                <p class="text-xs text-slate-400 italic">No hay PQRS pendientes por gestionar.</p>
                             <?php } else { ?>
-                                <?php foreach (array_slice($pqrsList, 0, 4) as $p) { 
+                                <?php foreach (array_slice($pqrsPendientesActivas, 0, 4) as $p) { 
                                     $p_id = get_val($p, ['Id', 'id', 'ID'], '0');
                                     $p_nombre = get_val($p, ['NombreRemitente', 'nombreremitente', 'Nombre'], 'Anónimo');
                                     $p_asunto = get_val($p, ['Asunto', 'asunto', 'Mensaje', 'mensaje'], '');
@@ -412,7 +439,7 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                             <p class="font-bold text-slate-200 mb-0.5">#<?php echo $p_id; ?> - <?php echo htmlspecialchars($p_nombre); ?></p>
                                             <p class="text-slate-400 truncate max-w-xs mb-0"><?php echo htmlspecialchars($p_asunto); ?></p>
                                         </div>
-                                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($p_estado) === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'; ?>">
+                                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
                                             <?php echo htmlspecialchars($p_estado); ?>
                                         </span>
                                     </div>
@@ -421,17 +448,17 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                         </div>
                     </div>
 
-                    <!-- Últimos Proyectos -->
+                    <!-- Últimos Proyectos Pendientes -->
                     <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5">
                         <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-base font-bold text-white mb-0">Últimos Proyectos Solicitados</h4>
-                            <a href="admin_dashboard.php?tab=proyectos" class="text-xs text-sky-400 hover:underline">Ver todos →</a>
+                            <h4 class="text-base font-bold text-white mb-0">Últimos Proyectos Pendientes</h4>
+                            <a href="admin_dashboard.php?tab=proyectos&filtro_proyectos=pendientes" class="text-xs text-sky-400 hover:underline">Ver todos →</a>
                         </div>
                         <div class="space-y-3">
-                            <?php if (empty($proyectosList)) { ?>
-                                <p class="text-xs text-slate-400 italic">No hay solicitudes de proyectos.</p>
+                            <?php if (empty($proyectosPendientesActivos)) { ?>
+                                <p class="text-xs text-slate-400 italic">No hay solicitudes de proyectos pendientes.</p>
                             <?php } else { ?>
-                                <?php foreach (array_slice($proyectosList, 0, 4) as $pr) { 
+                                <?php foreach (array_slice($proyectosPendientesActivos, 0, 4) as $pr) { 
                                     $pr_id = get_val($pr, ['Id', 'id', 'ID'], '0');
                                     $pr_contacto = get_val($pr, ['NombreCliente', 'nombrecliente', 'NombreContacto', 'nombrecontacto', 'Nombre', 'nombre'], 'Cliente');
                                     $pr_servicio = get_val($pr, ['TipoProyecto', 'tipoproyecto', 'TipoServicio', 'tiposervicio', 'Servicio', 'servicio'], 'Proyecto TI');
@@ -442,7 +469,7 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                             <p class="font-bold text-slate-200 mb-0.5">#<?php echo $pr_id; ?> - <?php echo htmlspecialchars($pr_contacto); ?></p>
                                             <p class="text-slate-400 truncate max-w-xs mb-0"><?php echo htmlspecialchars($pr_servicio); ?></p>
                                         </div>
-                                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($pr_estado) === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'; ?>">
+                                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider bg-sky-500/10 text-sky-400 border border-sky-500/20">
                                             <?php echo htmlspecialchars($pr_estado); ?>
                                         </span>
                                     </div>
@@ -531,7 +558,7 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                                 </span>
                                             </td>
                                             <td class="py-4 px-4 text-right">
-                                                <form method="POST" action="admin_dashboard.php?tab=pqrs" class="inline-flex items-center gap-2">
+                                                <form method="POST" action="admin_dashboard.php?tab=pqrs&filtro_pqrs=<?php echo htmlspecialchars($filtroPqrs); ?>" class="inline-flex items-center gap-2">
                                                     <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                                     <input type="hidden" name="action" value="update_pqrs">
                                                     <input type="hidden" name="pqrs_id" value="<?php echo $p_id; ?>">
@@ -633,7 +660,7 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                                 </span>
                                             </td>
                                             <td class="py-4 px-4 text-right">
-                                                <form method="POST" action="admin_dashboard.php?tab=proyectos" class="inline-flex items-center gap-2">
+                                                <form method="POST" action="admin_dashboard.php?tab=proyectos&filtro_proyectos=<?php echo htmlspecialchars($filtroProyectos); ?>" class="inline-flex items-center gap-2">
                                                     <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                                     <input type="hidden" name="action" value="update_proyecto">
                                                     <input type="hidden" name="proyecto_id" value="<?php echo $pr_id; ?>">
