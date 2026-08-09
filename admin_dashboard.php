@@ -122,7 +122,7 @@ $proyectosList = [];
 $testimoniosList = [];
 
 if ($connected && $pdo) {
-    // 1. Consulta PQRS (Resiliente a mayúsculas/minúsculas)
+    // 1. Consulta PQRS
     try {
         try {
             $stmt = $pdo->query("SELECT * FROM Pqrs ORDER BY Id DESC");
@@ -144,7 +144,7 @@ if ($connected && $pdo) {
         }
     }
 
-    // 2. Consulta Proyectos (Resiliente)
+    // 2. Consulta Proyectos
     try {
         try {
             $stmt = $pdo->query("SELECT * FROM Proyectos ORDER BY Id DESC");
@@ -166,7 +166,7 @@ if ($connected && $pdo) {
         }
     }
 
-    // 3. Consulta Testimonios / Comentarios (Resiliente)
+    // 3. Consulta Testimonios / Comentarios
     try {
         try {
             $stmt = $pdo->query("SELECT * FROM testimonios ORDER BY Id DESC");
@@ -233,29 +233,29 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
 
             <!-- Navegación de la Barra Lateral -->
             <nav class="p-4 space-y-1.5">
-                <a href="admin_dashboard.php?tab=dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all no-underline <?php echo $tab === 'dashboard' ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'; ?>">
+                <a href="admin_dashboard.php?tab=dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all no-underline <?php echo ($tab === 'dashboard') ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'; ?>">
                     <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     <span>General</span>
                 </a>
 
-                <a href="admin_dashboard.php?tab=pqrs" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all no-underline <?php echo $tab === 'pqrs' ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'; ?>">
+                <a href="admin_dashboard.php?tab=pqrs" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all no-underline <?php echo ($tab === 'pqrs') ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'; ?>">
                     <div class="flex items-center gap-3">
                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                         <span>Buzón PQRS</span>
                     </div>
-                    <?php if ($totalPqrsPendientes > 0): ?>
+                    <?php if ($totalPqrsPendientes > 0) { ?>
                         <span class="px-2 py-0.5 text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full"><?php echo $totalPqrsPendientes; ?></span>
-                    <?php endif; ?>
+                    <?php } ?>
                 </a>
 
-                <a href="admin_dashboard.php?tab=proyectos" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all no-underline <?php echo $tab === 'proyectos' ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'; ?>">
+                <a href="admin_dashboard.php?tab=proyectos" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all no-underline <?php echo ($tab === 'proyectos') ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'; ?>">
                     <div class="flex items-center gap-3">
                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         <span>Proyectos</span>
                     </div>
-                    <?php if ($totalProyectosPendientes > 0): ?>
+                    <?php if ($totalProyectosPendientes > 0) { ?>
                         <span class="px-2 py-0.5 text-xs font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30 rounded-full"><?php echo $totalProyectosPendientes; ?></span>
-                    <?php endif; ?>
+                    <?php } ?>
                 </a>
 
                 <a href="admin_dashboard.php?tab=comentarios" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all no-underline <?php echo ($tab === 'testimonios' || $tab === 'comentarios') ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'; ?>">
@@ -310,15 +310,15 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                 </h2>
             </div>
             <div class="flex items-center gap-3">
-                <?php if ($connected): ?>
+                <?php if ($connected) { ?>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> DB Conectada
                     </span>
-                <?php else: ?>
+                <?php } else { ?>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
                         <span class="w-2 h-2 rounded-full bg-rose-400"></span> DB Desconectada
                     </span>
-                <?php endif; ?>
+                <?php } ?>
             </div>
         </header>
 
@@ -326,26 +326,26 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
         <div class="flex-1 overflow-y-auto p-6 space-y-6">
 
             <!-- Mensajes de feedback -->
-            <?php if (!empty($successMessage)): ?>
+            <?php if (!empty($successMessage)) { ?>
                 <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <span><?php echo $successMessage; ?></span>
                     </div>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
-            <?php if (!empty($errorMessage)): ?>
+            <?php if (!empty($errorMessage)) { ?>
                 <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <svg class="w-5 h-5 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <span><?php echo $errorMessage; ?></span>
                     </div>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
             <!-- PESTAÑA 1: DASHBOARD GENERAL -->
-            <?php if ($tab === 'dashboard'): ?>
+            <?php if ($tab === 'dashboard') { ?>
                 <!-- Tarjetas KPI -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
                     <div class="p-5 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
@@ -398,10 +398,10 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                             <a href="admin_dashboard.php?tab=pqrs" class="text-xs text-sky-400 hover:underline">Ver todas →</a>
                         </div>
                         <div class="space-y-3">
-                            <?php if (empty($pqrsList)): ?>
+                            <?php if (empty($pqrsList)) { ?>
                                 <p class="text-xs text-slate-400 italic">No hay PQRS registradas.</p>
-                            <?php else: ?>
-                                <?php foreach (array_slice($pqrsList, 0, 4) as $p): 
+                            <?php } else { ?>
+                                <?php foreach (array_slice($pqrsList, 0, 4) as $p) { 
                                     $p_id = get_val($p, ['Id', 'id', 'ID'], '0');
                                     $p_nombre = get_val($p, ['NombreRemitente', 'nombreremitente', 'Nombre'], 'Anónimo');
                                     $p_asunto = get_val($p, ['Asunto', 'asunto', 'Mensaje', 'mensaje'], '');
@@ -416,8 +416,8 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                             <?php echo htmlspecialchars($p_estado); ?>
                                         </span>
                                     </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                                <?php } ?>
+                            <?php } ?>
                         </div>
                     </div>
 
@@ -428,10 +428,10 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                             <a href="admin_dashboard.php?tab=proyectos" class="text-xs text-sky-400 hover:underline">Ver todos →</a>
                         </div>
                         <div class="space-y-3">
-                            <?php if (empty($proyectosList)): ?>
+                            <?php if (empty($proyectosList)) { ?>
                                 <p class="text-xs text-slate-400 italic">No hay solicitudes de proyectos.</p>
-                            <?php else: ?>
-                                <?php foreach (array_slice($proyectosList, 0, 4) as $pr): 
+                            <?php } else { ?>
+                                <?php foreach (array_slice($proyectosList, 0, 4) as $pr) { 
                                     $pr_id = get_val($pr, ['Id', 'id', 'ID'], '0');
                                     $pr_contacto = get_val($pr, ['NombreContacto', 'nombrecontacto', 'Nombre'], 'Cliente');
                                     $pr_servicio = get_val($pr, ['TipoServicio', 'tiposervicio', 'Servicio'], 'Proyecto TI');
@@ -446,15 +446,15 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                             <?php echo htmlspecialchars($pr_estado); ?>
                                         </span>
                                     </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                                <?php } ?>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
             <!-- PESTAÑA 2: GESTIÓN DE PQRS -->
-            <?php if ($tab === 'pqrs'): ?>
+            <?php if ($tab === 'pqrs') { ?>
                 <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div>
@@ -476,11 +476,11 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                         <input type="text" id="searchPqrsInput" placeholder="Buscar PQRS por número (#), tipo de solicitud, fecha o nombre..." class="w-full bg-slate-900 text-slate-100 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-amber-500 placeholder:text-slate-500">
                     </div>
 
-                    <?php if (empty($pqrsFiltradas)): ?>
+                    <?php if (empty($pqrsFiltradas)) { ?>
                         <div class="p-12 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/50">
                             <p class="text-sm text-slate-400 mb-0">No se encontraron solicitudes PQRS para este filtro.</p>
                         </div>
-                    <?php else: ?>
+                    <?php } else { ?>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
@@ -495,7 +495,7 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                     </tr>
                                 </thead>
                                 <tbody id="pqrsTableBody" class="divide-y divide-slate-800/60">
-                                    <?php foreach ($pqrsFiltradas as $p): 
+                                    <?php foreach ($pqrsFiltradas as $p) { 
                                         $p_id = get_val($p, ['Id', 'id', 'ID'], '0');
                                         $p_nombre = get_val($p, ['NombreRemitente', 'nombreremitente', 'Nombre'], 'Anónimo');
                                         $p_tipo = get_val($p, ['TipoSolicitud', 'tiposolicitud', 'Tipo', 'tipo'], 'PQRS');
@@ -547,16 +547,16 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                                 </form>
                                             </td>
                                         </tr>
-                                    <?php endforeach; ?>
+                                    <?php } ?>
                                 </tbody>
                             </table>
                         </div>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
             <!-- PESTAÑA 3: GESTIÓN DE PROYECTOS -->
-            <?php if ($tab === 'proyectos'): ?>
+            <?php if ($tab === 'proyectos') { ?>
                 <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div>
@@ -578,11 +578,11 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                         <input type="text" id="searchProyectosInput" placeholder="Buscar proyecto por número (#), nombre, empresa, dirección o tipo de proyecto..." class="w-full bg-slate-900 text-slate-100 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-sky-500 placeholder:text-slate-500">
                     </div>
 
-                    <?php if (empty($proyectosFiltrados)): ?>
+                    <?php if (empty($proyectosFiltrados)) { ?>
                         <div class="p-12 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/50">
                             <p class="text-sm text-slate-400 mb-0">No se encontraron proyectos para este filtro.</p>
                         </div>
-                    <?php else: ?>
+                    <?php } else { ?>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
@@ -596,7 +596,7 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                     </tr>
                                 </thead>
                                 <tbody id="proyectosTableBody" class="divide-y divide-slate-800/60">
-                                    <?php foreach ($proyectosFiltrados as $pr): 
+                                    <?php foreach ($proyectosFiltrados as $pr) { 
                                         $pr_id = get_val($pr, ['Id', 'id', 'ID'], '0');
                                         $pr_contacto = get_val($pr, ['NombreContacto', 'nombrecontacto', 'Nombre'], 'Cliente');
                                         $pr_empresa = get_val($pr, ['NombreEmpresa', 'nombreempresa', 'Empresa'], '');
@@ -618,9 +618,9 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                             </td>
                                             <td class="py-4 px-4 text-slate-300">
                                                 <div><?php echo htmlspecialchars($pr_correo); ?></div>
-                                                <?php if (!empty($pr_direccion)): ?>
+                                                <?php if (!empty($pr_direccion)) { ?>
                                                     <div class="text-[11px] text-slate-400">📍 <?php echo htmlspecialchars($pr_direccion); ?> <?php echo htmlspecialchars($pr_ciudad); ?></div>
-                                                <?php endif; ?>
+                                                <?php } ?>
                                                 <div class="text-[11px] text-slate-500"><?php echo htmlspecialchars($pr_telefono); ?></div>
                                             </td>
                                             <td class="py-4 px-4 text-slate-300 max-w-xs">
@@ -649,16 +649,16 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                                 </form>
                                             </td>
                                         </tr>
-                                    <?php endforeach; ?>
+                                    <?php } ?>
                                 </tbody>
                             </table>
                         </div>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
             <!-- PESTAÑA 4: COMENTARIOS -->
-            <?php if ($tab === 'testimonios' || $tab === 'comentarios'): ?>
+            <?php if ($tab === 'testimonios' || $tab === 'comentarios') { ?>
                 <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
                     <div class="flex items-center justify-between mb-2">
                         <div>
@@ -678,13 +678,13 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                         <input type="text" id="searchComentariosInput" placeholder="Buscar comentario por nombre del usuario o cliente..." class="w-full bg-slate-900 text-slate-100 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-purple-500 placeholder:text-slate-500">
                     </div>
 
-                    <?php if (empty($testimoniosList)): ?>
+                    <?php if (empty($testimoniosList)) { ?>
                         <div class="p-12 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/50">
                             <p class="text-sm text-slate-400 mb-0">No se han registrado comentarios en la base de datos.</p>
                         </div>
-                    <?php else: ?>
+                    <?php } else { ?>
                         <div id="comentariosGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <?php foreach ($testimoniosList as $t): 
+                            <?php foreach ($testimoniosList as $t) { 
                                 $t_id = get_val($t, ['Id', 'id', 'ID'], '0');
                                 $t_nombre = get_val($t, ['Nombre', 'nombre'], 'Cliente');
                                 $t_cargo = get_val($t, ['Cargo', 'cargo'], 'Usuario');
@@ -696,9 +696,9 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                 <div class="comentario-card p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3" data-search="<?php echo htmlspecialchars($comentSearchStr); ?>">
                                     <div class="flex items-center justify-between">
                                         <div class="flex text-amber-400">
-                                            <?php for ($s = 0; $s < $t_estrellas; $s++): ?>
+                                            <?php for ($s = 0; $s < $t_estrellas; $s++) { ?>
                                                 ★
-                                            <?php endfor; ?>
+                                            <?php } ?>
                                         </div>
                                         <span class="text-[10px] font-mono text-slate-500">ID #<?php echo $t_id; ?></span>
                                     </div>
@@ -719,11 +719,11 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                         </form>
                                     </div>
                                 </div>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </div>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
         </div>
     </main>
