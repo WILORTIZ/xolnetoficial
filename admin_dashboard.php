@@ -433,8 +433,8 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                             <?php } else { ?>
                                 <?php foreach (array_slice($proyectosList, 0, 4) as $pr) { 
                                     $pr_id = get_val($pr, ['Id', 'id', 'ID'], '0');
-                                    $pr_contacto = get_val($pr, ['NombreContacto', 'nombrecontacto', 'Nombre'], 'Cliente');
-                                    $pr_servicio = get_val($pr, ['TipoServicio', 'tiposervicio', 'Servicio'], 'Proyecto TI');
+                                    $pr_contacto = get_val($pr, ['NombreCliente', 'nombrecliente', 'NombreContacto', 'nombrecontacto', 'Nombre', 'nombre'], 'Cliente');
+                                    $pr_servicio = get_val($pr, ['TipoProyecto', 'tipoproyecto', 'TipoServicio', 'tiposervicio', 'Servicio', 'servicio'], 'Proyecto TI');
                                     $pr_estado = get_val($pr, ['Estado', 'estado'], 'Pendiente');
                                 ?>
                                     <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800/80 flex items-center justify-between text-xs">
@@ -598,14 +598,14 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                 <tbody id="proyectosTableBody" class="divide-y divide-slate-800/60">
                                     <?php foreach ($proyectosFiltrados as $pr) { 
                                         $pr_id = get_val($pr, ['Id', 'id', 'ID'], '0');
-                                        $pr_contacto = get_val($pr, ['NombreContacto', 'nombrecontacto', 'Nombre'], 'Cliente');
-                                        $pr_empresa = get_val($pr, ['NombreEmpresa', 'nombreempresa', 'Empresa'], '');
-                                        $pr_correo = get_val($pr, ['CorreoContacto', 'correocontacto', 'Email'], 'N/A');
-                                        $pr_telefono = get_val($pr, ['TelefonoContacto', 'telefonocontacto', 'Telefono'], '');
-                                        $pr_direccion = get_val($pr, ['DireccionProyecto', 'direccionproyecto', 'Direccion'], '');
+                                        $pr_contacto = get_val($pr, ['NombreCliente', 'nombrecliente', 'NombreContacto', 'nombrecontacto', 'Nombre', 'nombre'], 'Cliente');
+                                        $pr_empresa = get_val($pr, ['NombreEmpresa', 'nombreempresa', 'Empresa', 'empresa'], '');
+                                        $pr_correo = get_val($pr, ['CorreoContacto', 'correocontacto', 'Correo', 'correo', 'Email', 'email'], 'N/A');
+                                        $pr_telefono = get_val($pr, ['TelefonoContacto', 'telefonocontacto', 'Telefono', 'telefono'], '');
+                                        $pr_direccion = get_val($pr, ['DireccionProyecto', 'direccionproyecto', 'Direccion', 'direccion'], '');
                                         $pr_ciudad = get_val($pr, ['Ciudad', 'ciudad'], '');
-                                        $pr_servicio = get_val($pr, ['TipoServicio', 'tiposervicio', 'Servicio'], 'General');
-                                        $pr_descripcion = get_val($pr, ['DescripcionProyecto', 'descripcionproyecto', 'Descripcion'], '');
+                                        $pr_servicio = get_val($pr, ['TipoProyecto', 'tipoproyecto', 'TipoServicio', 'tiposervicio', 'Servicio', 'servicio'], 'General');
+                                        $pr_descripcion = get_val($pr, ['DescripcionProyecto', 'descripcionproyecto', 'Descripcion', 'descripcion'], '');
                                         $pr_estado = get_val($pr, ['Estado', 'estado'], 'Pendiente');
 
                                         $proySearchStr = strtolower("$pr_id $pr_contacto $pr_empresa $pr_direccion $pr_ciudad $pr_servicio $pr_correo");
