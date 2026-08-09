@@ -407,6 +407,14 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                         </div>
                     </div>
 
+                    <!-- Buscador de PQRS (por Número #, Tipo, Fecha, Nombre) -->
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                        <input type="text" id="searchPqrsInput" placeholder="Buscar PQRS por número (#), tipo de solicitud, fecha o nombre..." class="w-full bg-slate-900 text-slate-100 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-amber-500 placeholder:text-slate-500">
+                    </div>
+
                     <?php if (empty($pqrsFiltradas)): ?>
                         <div class="p-12 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/50">
                             <p class="text-sm text-slate-400 mb-0">No se encontraron solicitudes PQRS para este filtro.</p>
@@ -417,18 +425,24 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                 <thead>
                                     <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
                                         <th class="py-3 px-4">Radicado</th>
-                                        <th class="py-3 px-4">Remitente</th>
+                                        <th class="py-3 px-4">Remitente / Tipo</th>
                                         <th class="py-3 px-4">Contacto</th>
                                         <th class="py-3 px-4">Asunto / Mensaje</th>
+                                        <th class="py-3 px-4">Fecha</th>
                                         <th class="py-3 px-4">Estado Actual</th>
                                         <th class="py-3 px-4 text-right">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-800/60">
-                                    <?php foreach ($pqrsFiltradas as $p): ?>
-                                        <tr class="hover:bg-slate-900/50 transition-colors">
-                                            <td class="py-4 px-4 font-bold text-sky-400">#<?php echo $p['Id']; ?></td>
-                                            <td class="py-4 px-4 font-medium text-white"><?php echo htmlspecialchars($p['NombreRemitente'] ?? 'Anónimo'); ?></td>
+                                <tbody id="pqrsTableBody" class="divide-y divide-slate-800/60">
+                                    <?php foreach ($pqrsFiltradas as $p): 
+                                        $pqrsSearchStr = strtolower(($p['Id']??'') . ' ' . ($p['TipoSolicitud']??$p['Tipo']??'') . ' ' . ($p['FechaCreacion']??$p['Fecha']??'') . ' ' . ($p['NombreRemitente']??'') . ' ' . ($p['Asunto']??'') . ' ' . ($p['CorreoRemitente']??''));
+                                    ?>
+                                        <tr class="pqrs-row hover:bg-slate-900/50 transition-colors" data-search="<?php echo htmlspecialchars($pqrsSearchStr); ?>">
+                                            <td class="py-4 px-4 font-bold text-amber-400">#<?php echo $p['Id']; ?></td>
+                                            <td class="py-4 px-4 font-medium text-white">
+                                                <div><?php echo htmlspecialchars($p['NombreRemitente'] ?? 'Anónimo'); ?></div>
+                                                <div class="text-[11px] text-amber-400 font-semibold"><?php echo htmlspecialchars($p['TipoSolicitud'] ?? $p['Tipo'] ?? 'PQRS'); ?></div>
+                                            </td>
                                             <td class="py-4 px-4 text-slate-300">
                                                 <div><?php echo htmlspecialchars($p['CorreoRemitente'] ?? 'N/A'); ?></div>
                                                 <div class="text-[11px] text-slate-500"><?php echo htmlspecialchars($p['TelefonoRemitente'] ?? ''); ?></div>
@@ -436,6 +450,9 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                             <td class="py-4 px-4 text-slate-300 max-w-xs">
                                                 <p class="font-semibold text-slate-200 mb-1"><?php echo htmlspecialchars($p['Asunto'] ?? 'Sin Asunto'); ?></p>
                                                 <p class="text-[11px] text-slate-400 line-clamp-2 mb-0"><?php echo htmlspecialchars($p['Mensaje'] ?? ''); ?></p>
+                                            </td>
+                                            <td class="py-4 px-4 text-slate-400 text-[11px] whitespace-nowrap">
+                                                <?php echo htmlspecialchars($p['FechaCreacion'] ?? $p['Fecha'] ?? 'N/A'); ?>
                                             </td>
                                             <td class="py-4 px-4">
                                                 <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($p['Estado'] ?? '') === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'; ?>">
@@ -482,6 +499,14 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                         </div>
                     </div>
 
+                    <!-- Buscador de Proyectos (por Número #, Nombre, Dirección, Empresa, Tipo de Proyecto) -->
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                        <input type="text" id="searchProyectosInput" placeholder="Buscar proyecto por número (#), nombre, empresa, dirección o tipo de proyecto..." class="w-full bg-slate-900 text-slate-100 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-sky-500 placeholder:text-slate-500">
+                    </div>
+
                     <?php if (empty($proyectosFiltrados)): ?>
                         <div class="p-12 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/50">
                             <p class="text-sm text-slate-400 mb-0">No se encontraron proyectos para este filtro.</p>
@@ -493,22 +518,27 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                     <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
                                         <th class="py-3 px-4">Proyecto</th>
                                         <th class="py-3 px-4">Cliente / Empresa</th>
-                                        <th class="py-3 px-4">Contacto</th>
+                                        <th class="py-3 px-4">Contacto / Dirección</th>
                                         <th class="py-3 px-4">Servicio Requerido</th>
                                         <th class="py-3 px-4">Estado</th>
                                         <th class="py-3 px-4 text-right">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-800/60">
-                                    <?php foreach ($proyectosFiltrados as $pr): ?>
-                                        <tr class="hover:bg-slate-900/50 transition-colors">
+                                <tbody id="proyectosTableBody" class="divide-y divide-slate-800/60">
+                                    <?php foreach ($proyectosFiltrados as $pr): 
+                                        $proySearchStr = strtolower(($pr['Id']??'') . ' ' . ($pr['NombreContacto']??'') . ' ' . ($pr['NombreEmpresa']??'') . ' ' . ($pr['DireccionProyecto']??$pr['Direccion']??'') . ' ' . ($pr['Ciudad']??'') . ' ' . ($pr['TipoServicio']??'') . ' ' . ($pr['CorreoContacto']??''));
+                                    ?>
+                                        <tr class="proyecto-row hover:bg-slate-900/50 transition-colors" data-search="<?php echo htmlspecialchars($proySearchStr); ?>">
                                             <td class="py-4 px-4 font-bold text-sky-400">#<?php echo $pr['Id']; ?></td>
                                             <td class="py-4 px-4 font-medium text-white">
                                                 <div><?php echo htmlspecialchars($pr['NombreContacto'] ?? 'Cliente'); ?></div>
-                                                <div class="text-[11px] text-slate-500"><?php echo htmlspecialchars($pr['NombreEmpresa'] ?? ''); ?></div>
+                                                <div class="text-[11px] text-sky-400 font-semibold"><?php echo htmlspecialchars($pr['NombreEmpresa'] ?? 'Empresa no especificada'); ?></div>
                                             </td>
                                             <td class="py-4 px-4 text-slate-300">
                                                 <div><?php echo htmlspecialchars($pr['CorreoContacto'] ?? 'N/A'); ?></div>
+                                                <?php if (!empty($pr['DireccionProyecto'] ?? $pr['Direccion'] ?? '')): ?>
+                                                    <div class="text-[11px] text-slate-400">📍 <?php echo htmlspecialchars($pr['DireccionProyecto'] ?? $pr['Direccion'] ?? ''); ?> <?php echo htmlspecialchars($pr['Ciudad'] ?? ''); ?></div>
+                                                <?php endif; ?>
                                                 <div class="text-[11px] text-slate-500"><?php echo htmlspecialchars($pr['TelefonoContacto'] ?? ''); ?></div>
                                             </td>
                                             <td class="py-4 px-4 text-slate-300 max-w-xs">
@@ -558,14 +588,24 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                         </span>
                     </div>
 
+                    <!-- Buscador de Comentarios (por Nombre de autor) -->
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                        <input type="text" id="searchComentariosInput" placeholder="Buscar comentario por nombre del usuario o cliente..." class="w-full bg-slate-900 text-slate-100 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-purple-500 placeholder:text-slate-500">
+                    </div>
+
                     <?php if (empty($testimoniosList)): ?>
                         <div class="p-12 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/50">
                             <p class="text-sm text-slate-400 mb-0">No se han registrado comentarios en la base de datos.</p>
                         </div>
                     <?php else: ?>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <?php foreach ($testimoniosList as $t): ?>
-                                <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+                        <div id="comentariosGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <?php foreach ($testimoniosList as $t): 
+                                $comentSearchStr = strtolower(($t['Nombre']??'') . ' ' . ($t['Cargo']??'') . ' ' . ($t['Texto']??''));
+                            ?>
+                                <div class="comentario-card p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3" data-search="<?php echo htmlspecialchars($comentSearchStr); ?>">
                                     <div class="flex items-center justify-between">
                                         <div class="flex text-amber-400">
                                             <?php for ($s = 0; $s < intval($t['Estrellas'] ?? 5); $s++): ?>
@@ -599,6 +639,50 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
 
         </div>
     </main>
+
+    <!-- SCRIPT FILTRADO EN TIEMPO REAL PARA BUSCADORES -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buscador PQRS
+            const searchPqrsInput = document.getElementById('searchPqrsInput');
+            if (searchPqrsInput) {
+                searchPqrsInput.addEventListener('input', function(e) {
+                    const q = e.target.value.toLowerCase().trim();
+                    const rows = document.querySelectorAll('#pqrsTableBody .pqrs-row');
+                    rows.forEach(row => {
+                        const searchData = row.getAttribute('data-search') || '';
+                        row.style.display = searchData.includes(q) ? '' : 'none';
+                    });
+                });
+            }
+
+            // Buscador Proyectos
+            const searchProyectosInput = document.getElementById('searchProyectosInput');
+            if (searchProyectosInput) {
+                searchProyectosInput.addEventListener('input', function(e) {
+                    const q = e.target.value.toLowerCase().trim();
+                    const rows = document.querySelectorAll('#proyectosTableBody .proyecto-row');
+                    rows.forEach(row => {
+                        const searchData = row.getAttribute('data-search') || '';
+                        row.style.display = searchData.includes(q) ? '' : 'none';
+                    });
+                });
+            }
+
+            // Buscador Comentarios (Nombre)
+            const searchComentariosInput = document.getElementById('searchComentariosInput');
+            if (searchComentariosInput) {
+                searchComentariosInput.addEventListener('input', function(e) {
+                    const q = e.target.value.toLowerCase().trim();
+                    const cards = document.querySelectorAll('#comentariosGrid .comentario-card');
+                    cards.forEach(card => {
+                        const searchData = card.getAttribute('data-search') || '';
+                        card.style.display = searchData.includes(q) ? '' : 'none';
+                    });
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>
