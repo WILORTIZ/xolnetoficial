@@ -5,7 +5,18 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-$userRole = $_SESSION['role'] ?? '';
+// Función helper para obtener valores sin importar mayúsculas/minúsculas en las llaves del array
+function get_val($arr, $keys, $default = '') {
+    if (!is_array($arr)) return $default;
+    foreach ((array)$keys as $k) {
+        if (array_key_exists($k, $arr) && $arr[$k] !== null && $arr[$k] !== '') {
+            return $arr[$k];
+        }
+    }
+    return $default;
+}
+
+$userRole = $_SESSION['role'] ?? $_SESSION['rol'] ?? '';
 $isAdmin = isset($_SESSION['user_id']) && (!empty($userRole) && (strtolower($userRole) === 'administrador' || strtolower($userRole) === 'admin' || strpos(strtolower($userRole), 'admin') !== false));
 
 if (!$isAdmin) {
@@ -17,7 +28,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 $csrfToken = $_SESSION['csrf_token'];
-$username = $_SESSION['username'] ?? 'Administrador';
+$username = $_SESSION['username'] ?? $_SESSION['usuario'] ?? 'Administrador';
 
 $successMessage = "";
 $errorMessage = "";
@@ -33,8 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $nuevoEstado = trim($_POST['nuevo_estado'] ?? '');
         if (!empty($pqrsId) && !empty($nuevoEstado) && $connected && $pdo) {
             try {
-                $stmt = $pdo->prepare("UPDATE Pqrs SET Estado = ? WHERE Id = ?");
-                $stmt->execute([$nuevoEstado, $pqrsId]);
+                try {
+                    $stmt = $pdo->prepare("UPDATE Pqrs SET Estado = ? WHERE Id = ?");
+                    $stmt->execute([$nuevoEstado, $pqrsId]);
+                } catch (PDOException $ex1) {
+                    $stmt = $pdo->prepare("UPDATE pqrs SET Estado = ? WHERE Id = ?");
+                    $stmt->execute([$nuevoEstado, $pqrsId]);
+                }
                 $successMessage = "PQRS #$pqrsId actualizada a: <b>$nuevoEstado</b>.";
                 $tab = 'pqrs';
             } catch (PDOException $e) {
@@ -54,8 +70,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $nuevoEstado = trim($_POST['nuevo_estado'] ?? '');
         if (!empty($proyectoId) && !empty($nuevoEstado) && $connected && $pdo) {
             try {
-                $stmt = $pdo->prepare("UPDATE Proyectos SET Estado = ? WHERE Id = ?");
-                $stmt->execute([$nuevoEstado, $proyectoId]);
+                try {
+                    $stmt = $pdo->prepare("UPDATE Proyectos SET Estado = ? WHERE Id = ?");
+                    $stmt->execute([$nuevoEstado, $proyectoId]);
+                } catch (PDOException $ex1) {
+                    $stmt = $pdo->prepare("UPDATE proyectos SET Estado = ? WHERE Id = ?");
+                    $stmt->execute([$nuevoEstado, $proyectoId]);
+                }
                 $successMessage = "Proyecto #$proyectoId actualizado a: <b>$nuevoEstado</b>.";
                 $tab = 'proyectos';
             } catch (PDOException $e) {
@@ -74,8 +95,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $testimonioId = trim($_POST['testimonio_id'] ?? '');
         if (!empty($testimonioId) && $connected && $pdo) {
             try {
-                $stmt = $pdo->prepare("DELETE FROM testimonios WHERE Id = ?");
-                $stmt->execute([$testimonioId]);
+                try {
+                    $stmt = $pdo->prepare("DELETE FROM testimonios WHERE Id = ?");
+                    $stmt->execute([$testimonioId]);
+                } catch (PDOException $ex1) {
+                    $stmt = $pdo->prepare("DELETE FROM Testimonios WHERE Id = ?");
+                    $stmt->execute([$testimonioId]);
+                }
                 $successMessage = "El comentario <b>#$testimonioId</b> ha sido eliminado exitosamente.";
                 $tab = 'comentarios';
             } catch (PDOException $e) {
@@ -96,39 +122,64 @@ $proyectosList = [];
 $testimoniosList = [];
 
 if ($connected && $pdo) {
+    // 1. Consulta PQRS (Resiliente a mayúsculas/minúsculas)
     try {
-        // PQRS
-        $stmt = $pdo->query("SELECT * FROM Pqrs ORDER BY Id DESC");
-        $pqrsList = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($pqrsList as $p) {
-            $est = strtolower($p['Estado'] ?? '');
-            if ($est === 'resuelto' || $est === 'resuelta' || $est === 'cerrado') {
-                $totalPqrsResueltas++;
-            } else {
-                $totalPqrsPendientes++;
-            }
+        try {
+            $stmt = $pdo->query("SELECT * FROM Pqrs ORDER BY Id DESC");
+            $pqrsList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $ex1) {
+            $stmt = $pdo->query("SELECT * FROM pqrs ORDER BY Id DESC");
+            $pqrsList = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-
-        // Proyectos
-        $stmt = $pdo->query("SELECT * FROM Proyectos ORDER BY Id DESC");
-        $proyectosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($proyectosList as $pr) {
-            $est = strtolower($pr['Estado'] ?? '');
-            if ($est === 'resuelto' || $est === 'completado' || $est === 'rechazado') {
-                $totalProyectosResueltos++;
-            } else {
-                $totalProyectosPendientes++;
-            }
-        }
-
-        // Testimonios / Comentarios
-        $stmt = $pdo->query("SELECT * FROM testimonios ORDER BY Id DESC");
-        $testimoniosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $totalTestimonios = count($testimoniosList);
-
     } catch (PDOException $e) {
-        $errorMessage = "Error al consultar la base de datos: " . $e->getMessage();
+        $pqrsList = [];
     }
+
+    foreach ($pqrsList as $p) {
+        $est = strtolower(get_val($p, ['Estado', 'estado'], ''));
+        if ($est === 'resuelto' || $est === 'resuelta' || $est === 'cerrado') {
+            $totalPqrsResueltas++;
+        } else {
+            $totalPqrsPendientes++;
+        }
+    }
+
+    // 2. Consulta Proyectos (Resiliente)
+    try {
+        try {
+            $stmt = $pdo->query("SELECT * FROM Proyectos ORDER BY Id DESC");
+            $proyectosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $ex1) {
+            $stmt = $pdo->query("SELECT * FROM proyectos ORDER BY Id DESC");
+            $proyectosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    } catch (PDOException $e) {
+        $proyectosList = [];
+    }
+
+    foreach ($proyectosList as $pr) {
+        $est = strtolower(get_val($pr, ['Estado', 'estado'], ''));
+        if ($est === 'resuelto' || $est === 'completado' || $est === 'rechazado') {
+            $totalProyectosResueltos++;
+        } else {
+            $totalProyectosPendientes++;
+        }
+    }
+
+    // 3. Consulta Testimonios / Comentarios (Resiliente)
+    try {
+        try {
+            $stmt = $pdo->query("SELECT * FROM testimonios ORDER BY Id DESC");
+            $testimoniosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $ex1) {
+            $stmt = $pdo->query("SELECT * FROM Testimonios ORDER BY Id DESC");
+            $testimoniosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    } catch (PDOException $e) {
+        $testimoniosList = [];
+    }
+
+    $totalTestimonios = count($testimoniosList);
 }
 
 $filtroPqrs = $_GET['filtro_pqrs'] ?? 'pendientes';
@@ -136,7 +187,7 @@ $filtroProyectos = $_GET['filtro_proyectos'] ?? 'pendientes';
 
 // Filtrar PQRS
 $pqrsFiltradas = array_filter($pqrsList, function($item) use ($filtroPqrs) {
-    $est = strtolower($item['Estado'] ?? '');
+    $est = strtolower(get_val($item, ['Estado', 'estado'], ''));
     $isResuelto = ($est === 'resuelto' || $est === 'resuelta' || $est === 'cerrado');
     if ($filtroPqrs === 'pendientes') return !$isResuelto;
     if ($filtroPqrs === 'resueltos') return $isResuelto;
@@ -145,7 +196,7 @@ $pqrsFiltradas = array_filter($pqrsList, function($item) use ($filtroPqrs) {
 
 // Filtrar Proyectos
 $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroProyectos) {
-    $est = strtolower($item['Estado'] ?? '');
+    $est = strtolower(get_val($item, ['Estado', 'estado'], ''));
     $isResuelto = ($est === 'resuelto' || $est === 'completado' || $est === 'rechazado');
     if ($filtroProyectos === 'pendientes') return !$isResuelto;
     if ($filtroProyectos === 'resueltos') return $isResuelto;
@@ -350,14 +401,19 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                             <?php if (empty($pqrsList)): ?>
                                 <p class="text-xs text-slate-400 italic">No hay PQRS registradas.</p>
                             <?php else: ?>
-                                <?php foreach (array_slice($pqrsList, 0, 4) as $p): ?>
+                                <?php foreach (array_slice($pqrsList, 0, 4) as $p): 
+                                    $p_id = get_val($p, ['Id', 'id', 'ID'], '0');
+                                    $p_nombre = get_val($p, ['NombreRemitente', 'nombreremitente', 'Nombre'], 'Anónimo');
+                                    $p_asunto = get_val($p, ['Asunto', 'asunto', 'Mensaje', 'mensaje'], '');
+                                    $p_estado = get_val($p, ['Estado', 'estado'], 'Pendiente');
+                                ?>
                                     <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800/80 flex items-center justify-between text-xs">
                                         <div>
-                                            <p class="font-bold text-slate-200 mb-0.5">#<?php echo $p['Id']; ?> - <?php echo htmlspecialchars($p['NombreRemitente'] ?? 'Anónimo'); ?></p>
-                                            <p class="text-slate-400 truncate max-w-xs mb-0"><?php echo htmlspecialchars($p['Asunto'] ?? $p['Mensaje'] ?? ''); ?></p>
+                                            <p class="font-bold text-slate-200 mb-0.5">#<?php echo $p_id; ?> - <?php echo htmlspecialchars($p_nombre); ?></p>
+                                            <p class="text-slate-400 truncate max-w-xs mb-0"><?php echo htmlspecialchars($p_asunto); ?></p>
                                         </div>
-                                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($p['Estado'] ?? '') === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'; ?>">
-                                            <?php echo htmlspecialchars($p['Estado'] ?? 'Pendiente'); ?>
+                                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($p_estado) === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'; ?>">
+                                            <?php echo htmlspecialchars($p_estado); ?>
                                         </span>
                                     </div>
                                 <?php endforeach; ?>
@@ -375,14 +431,19 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                             <?php if (empty($proyectosList)): ?>
                                 <p class="text-xs text-slate-400 italic">No hay solicitudes de proyectos.</p>
                             <?php else: ?>
-                                <?php foreach (array_slice($proyectosList, 0, 4) as $pr): ?>
+                                <?php foreach (array_slice($proyectosList, 0, 4) as $pr): 
+                                    $pr_id = get_val($pr, ['Id', 'id', 'ID'], '0');
+                                    $pr_contacto = get_val($pr, ['NombreContacto', 'nombrecontacto', 'Nombre'], 'Cliente');
+                                    $pr_servicio = get_val($pr, ['TipoServicio', 'tiposervicio', 'Servicio'], 'Proyecto TI');
+                                    $pr_estado = get_val($pr, ['Estado', 'estado'], 'Pendiente');
+                                ?>
                                     <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800/80 flex items-center justify-between text-xs">
                                         <div>
-                                            <p class="font-bold text-slate-200 mb-0.5">#<?php echo $pr['Id']; ?> - <?php echo htmlspecialchars($pr['NombreContacto'] ?? 'Cliente'); ?></p>
-                                            <p class="text-slate-400 truncate max-w-xs mb-0"><?php echo htmlspecialchars($pr['TipoServicio'] ?? 'Proyecto TI'); ?></p>
+                                            <p class="font-bold text-slate-200 mb-0.5">#<?php echo $pr_id; ?> - <?php echo htmlspecialchars($pr_contacto); ?></p>
+                                            <p class="text-slate-400 truncate max-w-xs mb-0"><?php echo htmlspecialchars($pr_servicio); ?></p>
                                         </div>
-                                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($pr['Estado'] ?? '') === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'; ?>">
-                                            <?php echo htmlspecialchars($pr['Estado'] ?? 'Pendiente'); ?>
+                                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($pr_estado) === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'; ?>">
+                                            <?php echo htmlspecialchars($pr_estado); ?>
                                         </span>
                                     </div>
                                 <?php endforeach; ?>
@@ -435,40 +496,50 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                 </thead>
                                 <tbody id="pqrsTableBody" class="divide-y divide-slate-800/60">
                                     <?php foreach ($pqrsFiltradas as $p): 
-                                        $pqrsSearchStr = strtolower(($p['Id']??'') . ' ' . ($p['TipoSolicitud']??$p['Tipo']??'') . ' ' . ($p['FechaCreacion']??$p['Fecha']??'') . ' ' . ($p['NombreRemitente']??'') . ' ' . ($p['Asunto']??'') . ' ' . ($p['CorreoRemitente']??''));
+                                        $p_id = get_val($p, ['Id', 'id', 'ID'], '0');
+                                        $p_nombre = get_val($p, ['NombreRemitente', 'nombreremitente', 'Nombre'], 'Anónimo');
+                                        $p_tipo = get_val($p, ['TipoSolicitud', 'tiposolicitud', 'Tipo', 'tipo'], 'PQRS');
+                                        $p_correo = get_val($p, ['CorreoRemitente', 'correoremitente', 'Email'], 'N/A');
+                                        $p_telefono = get_val($p, ['TelefonoRemitente', 'telefonoremitente', 'Telefono'], '');
+                                        $p_asunto = get_val($p, ['Asunto', 'asunto'], 'Sin Asunto');
+                                        $p_mensaje = get_val($p, ['Mensaje', 'mensaje'], '');
+                                        $p_fecha = get_val($p, ['FechaCreacion', 'fechacreacion', 'Fecha', 'fecha'], 'N/A');
+                                        $p_estado = get_val($p, ['Estado', 'estado'], 'Pendiente');
+
+                                        $pqrsSearchStr = strtolower("$p_id $p_tipo $p_fecha $p_nombre $p_asunto $p_correo");
                                     ?>
                                         <tr class="pqrs-row hover:bg-slate-900/50 transition-colors" data-search="<?php echo htmlspecialchars($pqrsSearchStr); ?>">
-                                            <td class="py-4 px-4 font-bold text-amber-400">#<?php echo $p['Id']; ?></td>
+                                            <td class="py-4 px-4 font-bold text-amber-400">#<?php echo $p_id; ?></td>
                                             <td class="py-4 px-4 font-medium text-white">
-                                                <div><?php echo htmlspecialchars($p['NombreRemitente'] ?? 'Anónimo'); ?></div>
-                                                <div class="text-[11px] text-amber-400 font-semibold"><?php echo htmlspecialchars($p['TipoSolicitud'] ?? $p['Tipo'] ?? 'PQRS'); ?></div>
+                                                <div><?php echo htmlspecialchars($p_nombre); ?></div>
+                                                <div class="text-[11px] text-amber-400 font-semibold"><?php echo htmlspecialchars($p_tipo); ?></div>
                                             </td>
                                             <td class="py-4 px-4 text-slate-300">
-                                                <div><?php echo htmlspecialchars($p['CorreoRemitente'] ?? 'N/A'); ?></div>
-                                                <div class="text-[11px] text-slate-500"><?php echo htmlspecialchars($p['TelefonoRemitente'] ?? ''); ?></div>
+                                                <div><?php echo htmlspecialchars($p_correo); ?></div>
+                                                <div class="text-[11px] text-slate-500"><?php echo htmlspecialchars($p_telefono); ?></div>
                                             </td>
                                             <td class="py-4 px-4 text-slate-300 max-w-xs">
-                                                <p class="font-semibold text-slate-200 mb-1"><?php echo htmlspecialchars($p['Asunto'] ?? 'Sin Asunto'); ?></p>
-                                                <p class="text-[11px] text-slate-400 line-clamp-2 mb-0"><?php echo htmlspecialchars($p['Mensaje'] ?? ''); ?></p>
+                                                <p class="font-semibold text-slate-200 mb-1"><?php echo htmlspecialchars($p_asunto); ?></p>
+                                                <p class="text-[11px] text-slate-400 line-clamp-2 mb-0"><?php echo htmlspecialchars($p_mensaje); ?></p>
                                             </td>
                                             <td class="py-4 px-4 text-slate-400 text-[11px] whitespace-nowrap">
-                                                <?php echo htmlspecialchars($p['FechaCreacion'] ?? $p['Fecha'] ?? 'N/A'); ?>
+                                                <?php echo htmlspecialchars($p_fecha); ?>
                                             </td>
                                             <td class="py-4 px-4">
-                                                <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($p['Estado'] ?? '') === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'; ?>">
-                                                    <?php echo htmlspecialchars($p['Estado'] ?? 'Pendiente'); ?>
+                                                <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($p_estado) === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'; ?>">
+                                                    <?php echo htmlspecialchars($p_estado); ?>
                                                 </span>
                                             </td>
                                             <td class="py-4 px-4 text-right">
                                                 <form method="POST" action="admin_dashboard.php?tab=pqrs" class="inline-flex items-center gap-2">
                                                     <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                                     <input type="hidden" name="action" value="update_pqrs">
-                                                    <input type="hidden" name="pqrs_id" value="<?php echo $p['Id']; ?>">
+                                                    <input type="hidden" name="pqrs_id" value="<?php echo $p_id; ?>">
                                                     
                                                     <select name="nuevo_estado" class="bg-slate-900 text-slate-200 border border-slate-700 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-sky-500">
-                                                        <option value="Pendiente" <?php if (($p['Estado']??'')==='Pendiente') echo 'selected'; ?>>Pendiente</option>
-                                                        <option value="En Proceso" <?php if (($p['Estado']??'')==='En Proceso') echo 'selected'; ?>>En Proceso</option>
-                                                        <option value="Resuelto" <?php if (($p['Estado']??'')==='Resuelto') echo 'selected'; ?>>Resuelto</option>
+                                                        <option value="Pendiente" <?php if (strtolower($p_estado)==='pendiente') echo 'selected'; ?>>Pendiente</option>
+                                                        <option value="En Proceso" <?php if (strtolower($p_estado)==='en proceso') echo 'selected'; ?>>En Proceso</option>
+                                                        <option value="Resuelto" <?php if (strtolower($p_estado)==='resuelto') echo 'selected'; ?>>Resuelto</option>
                                                     </select>
                                                     <button type="submit" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs rounded-lg transition-all shadow-sm">
                                                         Guardar
@@ -526,40 +597,51 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                 </thead>
                                 <tbody id="proyectosTableBody" class="divide-y divide-slate-800/60">
                                     <?php foreach ($proyectosFiltrados as $pr): 
-                                        $proySearchStr = strtolower(($pr['Id']??'') . ' ' . ($pr['NombreContacto']??'') . ' ' . ($pr['NombreEmpresa']??'') . ' ' . ($pr['DireccionProyecto']??$pr['Direccion']??'') . ' ' . ($pr['Ciudad']??'') . ' ' . ($pr['TipoServicio']??'') . ' ' . ($pr['CorreoContacto']??''));
+                                        $pr_id = get_val($pr, ['Id', 'id', 'ID'], '0');
+                                        $pr_contacto = get_val($pr, ['NombreContacto', 'nombrecontacto', 'Nombre'], 'Cliente');
+                                        $pr_empresa = get_val($pr, ['NombreEmpresa', 'nombreempresa', 'Empresa'], '');
+                                        $pr_correo = get_val($pr, ['CorreoContacto', 'correocontacto', 'Email'], 'N/A');
+                                        $pr_telefono = get_val($pr, ['TelefonoContacto', 'telefonocontacto', 'Telefono'], '');
+                                        $pr_direccion = get_val($pr, ['DireccionProyecto', 'direccionproyecto', 'Direccion'], '');
+                                        $pr_ciudad = get_val($pr, ['Ciudad', 'ciudad'], '');
+                                        $pr_servicio = get_val($pr, ['TipoServicio', 'tiposervicio', 'Servicio'], 'General');
+                                        $pr_descripcion = get_val($pr, ['DescripcionProyecto', 'descripcionproyecto', 'Descripcion'], '');
+                                        $pr_estado = get_val($pr, ['Estado', 'estado'], 'Pendiente');
+
+                                        $proySearchStr = strtolower("$pr_id $pr_contacto $pr_empresa $pr_direccion $pr_ciudad $pr_servicio $pr_correo");
                                     ?>
                                         <tr class="proyecto-row hover:bg-slate-900/50 transition-colors" data-search="<?php echo htmlspecialchars($proySearchStr); ?>">
-                                            <td class="py-4 px-4 font-bold text-sky-400">#<?php echo $pr['Id']; ?></td>
+                                            <td class="py-4 px-4 font-bold text-sky-400">#<?php echo $pr_id; ?></td>
                                             <td class="py-4 px-4 font-medium text-white">
-                                                <div><?php echo htmlspecialchars($pr['NombreContacto'] ?? 'Cliente'); ?></div>
-                                                <div class="text-[11px] text-sky-400 font-semibold"><?php echo htmlspecialchars($pr['NombreEmpresa'] ?? 'Empresa no especificada'); ?></div>
+                                                <div><?php echo htmlspecialchars($pr_contacto); ?></div>
+                                                <div class="text-[11px] text-sky-400 font-semibold"><?php echo htmlspecialchars($pr_empresa ?: 'Empresa no especificada'); ?></div>
                                             </td>
                                             <td class="py-4 px-4 text-slate-300">
-                                                <div><?php echo htmlspecialchars($pr['CorreoContacto'] ?? 'N/A'); ?></div>
-                                                <?php if (!empty($pr['DireccionProyecto'] ?? $pr['Direccion'] ?? '')): ?>
-                                                    <div class="text-[11px] text-slate-400">📍 <?php echo htmlspecialchars($pr['DireccionProyecto'] ?? $pr['Direccion'] ?? ''); ?> <?php echo htmlspecialchars($pr['Ciudad'] ?? ''); ?></div>
+                                                <div><?php echo htmlspecialchars($pr_correo); ?></div>
+                                                <?php if (!empty($pr_direccion)): ?>
+                                                    <div class="text-[11px] text-slate-400">📍 <?php echo htmlspecialchars($pr_direccion); ?> <?php echo htmlspecialchars($pr_ciudad); ?></div>
                                                 <?php endif; ?>
-                                                <div class="text-[11px] text-slate-500"><?php echo htmlspecialchars($pr['TelefonoContacto'] ?? ''); ?></div>
+                                                <div class="text-[11px] text-slate-500"><?php echo htmlspecialchars($pr_telefono); ?></div>
                                             </td>
                                             <td class="py-4 px-4 text-slate-300 max-w-xs">
-                                                <p class="font-semibold text-slate-200 mb-1"><?php echo htmlspecialchars($pr['TipoServicio'] ?? 'General'); ?></p>
-                                                <p class="text-[11px] text-slate-400 line-clamp-2 mb-0"><?php echo htmlspecialchars($pr['DescripcionProyecto'] ?? ''); ?></p>
+                                                <p class="font-semibold text-slate-200 mb-1"><?php echo htmlspecialchars($pr_servicio); ?></p>
+                                                <p class="text-[11px] text-slate-400 line-clamp-2 mb-0"><?php echo htmlspecialchars($pr_descripcion); ?></p>
                                             </td>
                                             <td class="py-4 px-4">
-                                                <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($pr['Estado'] ?? '') === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'; ?>">
-                                                    <?php echo htmlspecialchars($pr['Estado'] ?? 'Pendiente'); ?>
+                                                <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider <?php echo (strtolower($pr_estado) === 'resuelto') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'; ?>">
+                                                    <?php echo htmlspecialchars($pr_estado); ?>
                                                 </span>
                                             </td>
                                             <td class="py-4 px-4 text-right">
                                                 <form method="POST" action="admin_dashboard.php?tab=proyectos" class="inline-flex items-center gap-2">
                                                     <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                                     <input type="hidden" name="action" value="update_proyecto">
-                                                    <input type="hidden" name="proyecto_id" value="<?php echo $pr['Id']; ?>">
+                                                    <input type="hidden" name="proyecto_id" value="<?php echo $pr_id; ?>">
                                                     
                                                     <select name="nuevo_estado" class="bg-slate-900 text-slate-200 border border-slate-700 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-sky-500">
-                                                        <option value="Pendiente" <?php if (($pr['Estado']??'')==='Pendiente') echo 'selected'; ?>>Pendiente</option>
-                                                        <option value="En Proceso" <?php if (($pr['Estado']??'')==='En Proceso') echo 'selected'; ?>>En Proceso</option>
-                                                        <option value="Resuelto" <?php if (($pr['Estado']??'')==='Resuelto') echo 'selected'; ?>>Resuelto</option>
+                                                        <option value="Pendiente" <?php if (strtolower($pr_estado)==='pendiente') echo 'selected'; ?>>Pendiente</option>
+                                                        <option value="En Proceso" <?php if (strtolower($pr_estado)==='en proceso') echo 'selected'; ?>>En Proceso</option>
+                                                        <option value="Resuelto" <?php if (strtolower($pr_estado)==='resuelto') echo 'selected'; ?>>Resuelto</option>
                                                     </select>
                                                     <button type="submit" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs rounded-lg transition-all shadow-sm">
                                                         Guardar
@@ -603,27 +685,33 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                     <?php else: ?>
                         <div id="comentariosGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <?php foreach ($testimoniosList as $t): 
-                                $comentSearchStr = strtolower(($t['Nombre']??'') . ' ' . ($t['Cargo']??'') . ' ' . ($t['Texto']??''));
+                                $t_id = get_val($t, ['Id', 'id', 'ID'], '0');
+                                $t_nombre = get_val($t, ['Nombre', 'nombre'], 'Cliente');
+                                $t_cargo = get_val($t, ['Cargo', 'cargo'], 'Usuario');
+                                $t_texto = get_val($t, ['Texto', 'texto'], '');
+                                $t_estrellas = intval(get_val($t, ['Estrellas', 'estrellas'], 5));
+
+                                $comentSearchStr = strtolower("$t_nombre $t_cargo $t_texto");
                             ?>
                                 <div class="comentario-card p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3" data-search="<?php echo htmlspecialchars($comentSearchStr); ?>">
                                     <div class="flex items-center justify-between">
                                         <div class="flex text-amber-400">
-                                            <?php for ($s = 0; $s < intval($t['Estrellas'] ?? 5); $s++): ?>
+                                            <?php for ($s = 0; $s < $t_estrellas; $s++): ?>
                                                 ★
                                             <?php endfor; ?>
                                         </div>
-                                        <span class="text-[10px] font-mono text-slate-500">ID #<?php echo $t['Id']; ?></span>
+                                        <span class="text-[10px] font-mono text-slate-500">ID #<?php echo $t_id; ?></span>
                                     </div>
-                                    <p class="text-xs text-slate-300 italic leading-relaxed mb-0">"<?php echo htmlspecialchars($t['Texto'] ?? ''); ?>"</p>
+                                    <p class="text-xs text-slate-300 italic leading-relaxed mb-0">"<?php echo htmlspecialchars($t_texto); ?>"</p>
                                     <div class="pt-2.5 border-t border-slate-800/60 flex items-center justify-between">
                                         <div>
-                                            <p class="text-xs font-bold text-white mb-0"><?php echo htmlspecialchars($t['Nombre'] ?? 'Cliente'); ?></p>
-                                            <p class="text-[11px] text-slate-400 mb-0"><?php echo htmlspecialchars($t['Cargo'] ?? 'Usuario'); ?></p>
+                                            <p class="text-xs font-bold text-white mb-0"><?php echo htmlspecialchars($t_nombre); ?></p>
+                                            <p class="text-[11px] text-slate-400 mb-0"><?php echo htmlspecialchars($t_cargo); ?></p>
                                         </div>
                                         <form method="POST" action="admin_dashboard.php?tab=comentarios" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este comentario permanentemente?');">
                                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                             <input type="hidden" name="action" value="delete_testimonio">
-                                            <input type="hidden" name="testimonio_id" value="<?php echo $t['Id']; ?>">
+                                            <input type="hidden" name="testimonio_id" value="<?php echo $t_id; ?>">
                                             <button type="submit" class="px-2.5 py-1 bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/20 text-xs font-medium rounded-lg transition-all flex items-center gap-1">
                                                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                                 Eliminar
