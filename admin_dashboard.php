@@ -65,6 +65,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// Procesar eliminación de testimonios
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_testimonio') {
+    $postedToken = $_POST['csrf_token'] ?? '';
+    if (empty($postedToken) || !hash_equals($_SESSION['csrf_token'], $postedToken)) {
+        $errorMessage = "Error de validación de seguridad (CSRF).";
+    } else {
+        $testimonioId = trim($_POST['testimonio_id'] ?? '');
+        if (!empty($testimonioId) && $connected && $pdo) {
+            try {
+                $stmt = $pdo->prepare("DELETE FROM testimonios WHERE Id = ?");
+                $stmt->execute([$testimonioId]);
+                $successMessage = "El comentario <b>#$testimonioId</b> ha sido eliminado exitosamente.";
+                $tab = 'testimonios';
+            } catch (PDOException $e) {
+                $errorMessage = "Error al eliminar el comentario: " . $e->getMessage();
+            }
+        }
+    }
+}
+
 // Consultar datos de métricas y listas
 $totalPqrsPendientes = 0;
 $totalPqrsResueltas = 0;
@@ -555,9 +575,20 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                         <span class="text-[10px] font-mono text-slate-500">ID #<?php echo $t['Id']; ?></span>
                                     </div>
                                     <p class="text-xs text-slate-300 italic leading-relaxed mb-0">"<?php echo htmlspecialchars($t['Texto'] ?? ''); ?>"</p>
-                                    <div class="pt-2 border-t border-slate-800/60">
-                                        <p class="text-xs font-bold text-white mb-0"><?php echo htmlspecialchars($t['Nombre'] ?? 'Cliente'); ?></p>
-                                        <p class="text-[11px] text-slate-400 mb-0"><?php echo htmlspecialchars($t['Cargo'] ?? 'Usuario'); ?></p>
+                                    <div class="pt-2.5 border-t border-slate-800/60 flex items-center justify-between">
+                                        <div>
+                                            <p class="text-xs font-bold text-white mb-0"><?php echo htmlspecialchars($t['Nombre'] ?? 'Cliente'); ?></p>
+                                            <p class="text-[11px] text-slate-400 mb-0"><?php echo htmlspecialchars($t['Cargo'] ?? 'Usuario'); ?></p>
+                                        </div>
+                                        <form method="POST" action="admin_dashboard.php?tab=testimonios" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este comentario permanentemente?');">
+                                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                            <input type="hidden" name="action" value="delete_testimonio">
+                                            <input type="hidden" name="testimonio_id" value="<?php echo $t['Id']; ?>">
+                                            <button type="submit" class="px-2.5 py-1 bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/20 text-xs font-medium rounded-lg transition-all flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                Eliminar
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
