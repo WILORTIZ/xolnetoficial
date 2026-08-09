@@ -122,13 +122,13 @@ $proyectosList = [];
 $testimoniosList = [];
 
 if ($connected && $pdo) {
-    // 1. Consulta PQRS
+    // 1. Consulta PQRS (Ordenado del más antiguo al más nuevo por ID)
     try {
         try {
-            $stmt = $pdo->query("SELECT * FROM Pqrs ORDER BY Id DESC");
+            $stmt = $pdo->query("SELECT * FROM Pqrs ORDER BY Id ASC");
             $pqrsList = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $ex1) {
-            $stmt = $pdo->query("SELECT * FROM pqrs ORDER BY Id DESC");
+            $stmt = $pdo->query("SELECT * FROM pqrs ORDER BY Id ASC");
             $pqrsList = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     } catch (PDOException $e) {
@@ -144,13 +144,13 @@ if ($connected && $pdo) {
         }
     }
 
-    // 2. Consulta Proyectos
+    // 2. Consulta Proyectos (Ordenado del más antiguo al más nuevo por ID)
     try {
         try {
-            $stmt = $pdo->query("SELECT * FROM Proyectos ORDER BY Id DESC");
+            $stmt = $pdo->query("SELECT * FROM Proyectos ORDER BY Id ASC");
             $proyectosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $ex1) {
-            $stmt = $pdo->query("SELECT * FROM proyectos ORDER BY Id DESC");
+            $stmt = $pdo->query("SELECT * FROM proyectos ORDER BY Id ASC");
             $proyectosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     } catch (PDOException $e) {

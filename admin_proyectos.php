@@ -52,12 +52,12 @@ $proyectosList = [];
 try {
     if ($pdo instanceof PDO) {
         if ($filtro === 'resueltos') {
-            $stmt = $pdo->query("SELECT * FROM Proyectos WHERE Estado IN ('Resuelto', 'Resuelta', 'Completado', 'Rechazado') ORDER BY FechaCreacion DESC");
+            $stmt = $pdo->query("SELECT * FROM Proyectos WHERE Estado IN ('Resuelto', 'Resuelta', 'Completado', 'Rechazado') ORDER BY Id ASC");
         } elseif ($filtro === 'todos') {
-            $stmt = $pdo->query("SELECT * FROM Proyectos ORDER BY FechaCreacion DESC");
+            $stmt = $pdo->query("SELECT * FROM Proyectos ORDER BY Id ASC");
         } else {
             // default: pendientes (activos)
-            $stmt = $pdo->query("SELECT * FROM Proyectos WHERE Estado NOT IN ('Resuelto', 'Resuelta', 'Completado', 'Rechazado') ORDER BY FechaCreacion DESC");
+            $stmt = $pdo->query("SELECT * FROM Proyectos WHERE Estado NOT IN ('Resuelto', 'Resuelta', 'Completado', 'Rechazado') ORDER BY Id ASC");
         }
         $proyectosList = $stmt->fetchAll();
     }

@@ -51,12 +51,12 @@ $pqrsList = [];
 try {
     if ($pdo instanceof PDO) {
         if ($filtro === 'resueltos') {
-            $stmt = $pdo->query("SELECT * FROM Pqrs WHERE Estado IN ('Resuelto', 'Resuelta', 'Atendido', 'Cerrado') ORDER BY FechaCreacion DESC");
+            $stmt = $pdo->query("SELECT * FROM Pqrs WHERE Estado IN ('Resuelto', 'Resuelta', 'Atendido', 'Cerrado') ORDER BY Id ASC");
         } elseif ($filtro === 'todos') {
-            $stmt = $pdo->query("SELECT * FROM Pqrs ORDER BY FechaCreacion DESC");
+            $stmt = $pdo->query("SELECT * FROM Pqrs ORDER BY Id ASC");
         } else {
             // default: pendientes (activos)
-            $stmt = $pdo->query("SELECT * FROM Pqrs WHERE Estado NOT IN ('Resuelto', 'Resuelta', 'Atendido', 'Cerrado') ORDER BY FechaCreacion DESC");
+            $stmt = $pdo->query("SELECT * FROM Pqrs WHERE Estado NOT IN ('Resuelto', 'Resuelta', 'Atendido', 'Cerrado') ORDER BY Id ASC");
         }
         $pqrsList = $stmt->fetchAll();
     }
