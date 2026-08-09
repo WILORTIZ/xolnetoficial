@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// Procesar eliminación de testimonios
+// Procesar eliminación de testimonios / comentarios
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_testimonio') {
     $postedToken = $_POST['csrf_token'] ?? '';
     if (empty($postedToken) || !hash_equals($_SESSION['csrf_token'], $postedToken)) {
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $stmt = $pdo->prepare("DELETE FROM testimonios WHERE Id = ?");
                 $stmt->execute([$testimonioId]);
                 $successMessage = "El comentario <b>#$testimonioId</b> ha sido eliminado exitosamente.";
-                $tab = 'testimonios';
+                $tab = 'comentarios';
             } catch (PDOException $e) {
                 $errorMessage = "Error al eliminar el comentario: " . $e->getMessage();
             }
@@ -121,7 +121,7 @@ if ($connected && $pdo) {
             }
         }
 
-        // Testimonios
+        // Testimonios / Comentarios
         $stmt = $pdo->query("SELECT * FROM testimonios ORDER BY Id DESC");
         $testimoniosList = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $totalTestimonios = count($testimoniosList);
@@ -207,10 +207,10 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                     <?php endif; ?>
                 </a>
 
-                <a href="admin_dashboard.php?tab=testimonios" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all no-underline <?php echo $tab === 'testimonios' ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'; ?>">
+                <a href="admin_dashboard.php?tab=comentarios" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all no-underline <?php echo ($tab === 'testimonios' || $tab === 'comentarios') ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'; ?>">
                     <div class="flex items-center gap-3">
                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                        <span>Testimonios</span>
+                        <span>Comentarios</span>
                     </div>
                     <span class="px-2 py-0.5 text-xs font-medium bg-slate-800 text-slate-400 rounded-full"><?php echo $totalTestimonios; ?></span>
                 </a>
@@ -253,7 +253,7 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                     <?php 
                         if ($tab === 'pqrs') echo "Gestión de solicitudes PQRS";
                         elseif ($tab === 'proyectos') echo "Gestión de solicitudes de proyectos";
-                        elseif ($tab === 'testimonios') echo "Testimonios y Comentarios recibidos";
+                        elseif ($tab === 'testimonios' || $tab === 'comentarios') echo "Comentarios recibidos";
                         else echo "Resumen General del Sistema";
                     ?>
                 </h2>
@@ -329,7 +329,7 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
 
                     <div class="p-5 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
                         <div>
-                            <p class="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Total Testimonios</p>
+                            <p class="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Total Comentarios</p>
                             <h3 class="text-3xl font-extrabold text-purple-400 mb-0"><?php echo $totalTestimonios; ?></h3>
                         </div>
                         <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
@@ -545,12 +545,12 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                 </div>
             <?php endif; ?>
 
-            <!-- PESTAÑA 4: TESTIMONIOS -->
-            <?php if ($tab === 'testimonios'): ?>
+            <!-- PESTAÑA 4: COMENTARIOS -->
+            <?php if ($tab === 'testimonios' || $tab === 'comentarios'): ?>
                 <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
                     <div class="flex items-center justify-between mb-2">
                         <div>
-                            <h3 class="text-lg font-bold text-white mb-1">Testimonios Registrados</h3>
+                            <h3 class="text-lg font-bold text-white mb-1">Comentarios Registrados</h3>
                             <p class="text-xs text-slate-400 mb-0">Comentarios enviados por los usuarios en el sitio principal.</p>
                         </div>
                         <span class="px-3 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-bold rounded-full">
@@ -560,7 +560,7 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
 
                     <?php if (empty($testimoniosList)): ?>
                         <div class="p-12 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/50">
-                            <p class="text-sm text-slate-400 mb-0">No se han registrado testimonios en la base de datos.</p>
+                            <p class="text-sm text-slate-400 mb-0">No se han registrado comentarios en la base de datos.</p>
                         </div>
                     <?php else: ?>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -580,7 +580,7 @@ $proyectosFiltrados = array_filter($proyectosList, function($item) use ($filtroP
                                             <p class="text-xs font-bold text-white mb-0"><?php echo htmlspecialchars($t['Nombre'] ?? 'Cliente'); ?></p>
                                             <p class="text-[11px] text-slate-400 mb-0"><?php echo htmlspecialchars($t['Cargo'] ?? 'Usuario'); ?></p>
                                         </div>
-                                        <form method="POST" action="admin_dashboard.php?tab=testimonios" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este comentario permanentemente?');">
+                                        <form method="POST" action="admin_dashboard.php?tab=comentarios" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este comentario permanentemente?');">
                                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                             <input type="hidden" name="action" value="delete_testimonio">
                                             <input type="hidden" name="testimonio_id" value="<?php echo $t['Id']; ?>">
