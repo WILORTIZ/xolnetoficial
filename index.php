@@ -1,7 +1,51 @@
 <?php
+require_once 'db.php';
+
+// Manejo de peticiones POST de comentarios (debe ejecutarse antes de cualquier salida HTML)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_comment') {
+    header('Content-Type: application/json');
+    $nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
+    $cargo = isset($_POST['cargo']) ? trim($_POST['cargo']) : '';
+    $texto = isset($_POST['texto']) ? trim($_POST['texto']) : '';
+    $estrellas = isset($_POST['estrellas']) ? (int)$_POST['estrellas'] : 5;
+    
+    if (empty($nombre) || empty($cargo) || empty($texto)) {
+        echo json_encode(['success' => false, 'message' => 'Por favor complete todos los campos obligatorios.']);
+        exit;
+    }
+    
+    if ($estrellas < 1 || $estrellas > 5) {
+        $estrellas = 5;
+    }
+    
+    if ($connected && $pdo) {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO testimonios (Nombre, Cargo, Texto, Estrellas) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$nombre, $cargo, '"' . $texto . '"', $estrellas]);
+            echo json_encode(['success' => true, 'comment' => [
+                'nombre' => $nombre,
+                'cargo' => $cargo,
+                'texto' => '"' . $texto . '"',
+                'estrellas' => $estrellas
+            ]]);
+            exit;
+        } catch (PDOException $e) {
+            echo json_encode(['success' => false, 'message' => 'Error al guardar en base de datos: ' . $e->getMessage()]);
+            exit;
+        }
+    } else {
+        echo json_encode(['success' => true, 'comment' => [
+            'nombre' => $nombre,
+            'cargo' => $cargo,
+            'texto' => '"' . $texto . '"',
+            'estrellas' => $estrellas
+        ]]);
+        exit;
+    }
+}
+
 $pageTitle = "Inicio";
 include 'header.php';
-require_once 'db.php';
 
 // Obtener empresas activas de la base de datos para la marquesina animada
 $empresasMarquee = [];
@@ -122,7 +166,7 @@ if (empty($empresasMarquee)) {
                                             <img src="images/hero_slides/networking.jpg" alt="Networking" class="w-full h-full object-cover">
                                             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent p-4 flex flex-col justify-end text-left">
                                                 <span class="text-[11px] font-mono text-cyan-300 font-semibold tracking-wider uppercase">02 / 05 — Networking</span>
-                                                <h4 class="text-white font-bold text-base md:text-lg mb-0">Cableado Estructurado & Routing</h4>
+                                                <h4 class="text-white font-bold text-base md:text-lg mb-0">Mesa de Ayuda para PYMEs</h4>
                                             </div>
                                         </div>
                                         <div class="slide-item absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out">
@@ -198,28 +242,28 @@ if (empty($empresasMarquee)) {
                 <h2 class="font-headline-lg text-headline-lg max-w-2xl text-2xl md:text-4xl font-bold text-on-surface">Sistemas integrales diseñados para durabilidad, cumplimiento normativo y alto rendimiento.</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Pillar 1: Cableado Estructurado -->
+                <!-- Pillar 1: Mesa de Ayuda para PYMEs -->
                 <div class="bg-white border border-outline-variant/30 rounded-xl p-8 hover:border-primary/50 transition-all group shadow-sm hover:shadow-md">
                     <div class="w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-                        <svg class="w-7 h-7 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8M9 2h6M6 10h12v4a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-4zm6 7v5"/></svg>
+                        <svg class="w-7 h-7 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
                     </div>
-                    <h3 class="font-headline-md text-xl font-bold mb-3 text-on-surface">Cableado Estructurado</h3>
-                    <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed">Certificación de redes Cat 6, 6A y 7. Organización profesional de racks y peinado de cables.</p>
+                    <h3 class="font-headline-md text-xl font-bold mb-3 text-on-surface">Mesa de Ayuda para PYMEs</h3>
+                    <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed">Soporte técnico remoto y presencial especializado para pequeñas empresas, garantizando continuidad operativa.</p>
                     <ul class="space-y-2.5 font-label-md text-on-surface/80 list-none p-0">
-                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Certificación de Enlaces</li>
-                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Gestión de Gabinetes</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Soporte Técnico Remoto &amp; Presencial</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Atención Rápida para Pequeñas Empresas</li>
                     </ul>
                 </div>
-                <!-- Pillar 2: Networking & Redes -->
+                <!-- Pillar 2: Diseño Web & Software a Medida -->
                 <div class="bg-white border border-outline-variant/30 rounded-xl p-8 hover:border-primary/50 transition-all group shadow-sm hover:shadow-md">
                     <div class="w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-                        <svg class="w-7 h-7 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="14" width="20" height="6" rx="1" /><path d="M6 14v-4M18 14v-4M12 14v-8M10 2l2 2 2-2" /><circle cx="6" cy="17" r="0.5" fill="currentColor" /><circle cx="10" cy="17" r="0.5" fill="currentColor" /></svg>
+                        <svg class="w-7 h-7 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><polyline points="7 8 3 12 7 16"/><polyline points="17 8 21 12 17 16"/></svg>
                     </div>
-                    <h3 class="font-headline-md text-xl font-bold mb-3 text-on-surface">Networking &amp; Redes</h3>
-                    <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed">Gestión inteligente de tráfico, switching y routing corporativo (Cisco, Aruba, MikroTik).</p>
+                    <h3 class="font-headline-md text-xl font-bold mb-3 text-on-surface">Diseño Web &amp; Software a Medida</h3>
+                    <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed">Desarrollo de sitios web modernos, aplicaciones dinámicas y sistemas de software personalizados.</p>
                     <ul class="space-y-2.5 font-label-md text-on-surface/80 list-none p-0">
-                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Alta Disponibilidad</li>
-                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Wi-Fi Gestionado</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Sitios Web 100% Responsive</li>
+                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg> Software &amp; Sistemas a Medida</li>
                     </ul>
                 </div>
                 <!-- Pillar 3: Seguridad Electrónica -->
@@ -250,7 +294,8 @@ if (empty($empresasMarquee)) {
         </div>
     </section>
 
-    <!-- Product Showcase (Physical Infrastructure Control) -->
+    <!-- Product Showcase (Physical Infrastructure Control) - Guardado comentado para uso futuro -->
+    <?php /* 
     <section class="section-padding bg-surface py-20 overflow-hidden">
         <div class="max-w-container-max mx-auto px-4 md:px-margin-desktop text-center mb-16">
             <span class="font-label-md text-label-md text-primary uppercase tracking-[0.2em] mb-3 block font-semibold">Operaciones Técnicas</span>
@@ -343,59 +388,72 @@ if (empty($empresasMarquee)) {
             </div>
         </div>
     </section>
+    */ ?>
 
     <!-- Testimonials Section (Visualización Aleatoria) -->
     <section class="section-padding bg-surface py-20" id="testimonios">
         <div class="max-w-container-max mx-auto px-4 md:px-margin-desktop">
-            <div class="text-center mb-16">
-                <span class="font-label-md text-label-md text-primary uppercase tracking-[0.2em] mb-3 block font-semibold">CLIENTES SATISFECHOS</span>
-                <h2 class="font-headline-lg text-headline-lg text-2xl md:text-4xl font-bold text-on-surface">Confianza respaldada por resultados reales</h2>
-            </div>
             <?php
-            $testimonios = [
-                [
-                    'texto' => '"La certificación de nuestro cableado estructurado fue impecable. El orden y la documentación técnica superaron nuestras expectativas."',
-                    'nombre' => 'Carlos Mendoza',
-                    'cargo' => 'Director de IT, TechCorp',
-                    'estrellas' => 5
-                ],
-                [
-                    'texto' => '"Gracias a xcolnet, nuestra red Wi-Fi corporativa ahora es estable y segura. El soporte técnico 24/7 es realmente proactivo."',
-                    'nombre' => 'Elena Rodríguez',
-                    'cargo' => 'Gerente de Operaciones, Global Net',
-                    'estrellas' => 5
-                ],
-                [
-                    'texto' => '"El sistema de control biométrico y CCTV integrado nos ha dado una tranquilidad total sobre la seguridad de nuestros nodos."',
-                    'nombre' => 'Ricardo Silva',
-                    'cargo' => 'Jefe de Infraestructura, Data Hub',
-                    'estrellas' => 5
-                ],
-                [
-                    'texto' => '"Excelente tiempo de respuesta y atención profesional. Lograron migrar nuestra infraestructura de servidores sin interrumpir la operación."',
-                    'nombre' => 'Andrea Morales',
-                    'cargo' => 'Líder de Sistemas, Systems S.A.',
-                    'estrellas' => 5
-                ],
-                [
-                    'texto' => '"Implementaron la infraestructura de red de nuestras nuevas oficinas con la mejor calidad y certificación Cat6A. 100% recomendados."',
-                    'nombre' => 'Gabriel Torres',
-                    'cargo' => 'Gerente General, InfraStruc',
-                    'estrellas' => 5
-                ],
-                [
-                    'texto' => '"El monitoreo de cámaras IP con analítica de IA revolucionó el control de acceso de nuestro centro de cómputo."',
-                    'nombre' => 'Lucía Restrepo',
-                    'cargo' => 'Directora de Seguridad, Global Data',
-                    'estrellas' => 5
-                ]
+            // Cargar comentarios guardados de la base de datos (más recientes primero)
+            $testimoniosDb = [];
+            if ($connected && $pdo) {
+                try {
+                    $stmt = $pdo->query("SELECT Nombre as nombre, Cargo as cargo, Texto as texto, Estrellas as estrellas FROM testimonios ORDER BY Id DESC");
+                    $testimoniosDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                } catch (PDOException $e) {
+                    // Ignorar silenciosamente si hay error al cargar
+                }
+            }
+
+            $testimoniosEstaticos = [
+                ['texto' => '"La certificación de nuestro cableado estructurado fue impecable. El orden y la documentación técnica superaron nuestras expectativas."', 'nombre' => 'Carlos Mendoza', 'cargo' => 'Director de IT, TechCorp', 'estrellas' => 5],
+                ['texto' => '"Gracias a xcolnet, nuestra red Wi-Fi corporativa ahora es estable y segura. El soporte técnico 24/7 es realmente proactivo."', 'nombre' => 'Elena Rodríguez', 'cargo' => 'Gerente de Operaciones, Global Net', 'estrellas' => 5],
+                ['texto' => '"El sistema de control biométrico y CCTV integrado nos ha dado una tranquilidad total sobre la seguridad de nuestros nodos."', 'nombre' => 'Ricardo Silva', 'cargo' => 'Jefe de Infraestructura, Data Hub', 'estrellas' => 5],
+                ['texto' => '"Excelente tiempo de respuesta y atención profesional. Lograron migrar nuestra infraestructura de servidores sin interrumpir la operación."', 'nombre' => 'Andrea Morales', 'cargo' => 'Líder de Sistemas, Systems S.A.', 'estrellas' => 5],
+                ['texto' => '"Implementaron la infraestructura de red de nuestras nuevas oficinas con la mejor calidad y certificación Cat6A. 100% recomendados."', 'nombre' => 'Gabriel Torres', 'cargo' => 'Gerente General, InfraStruc', 'estrellas' => 5],
+                ['texto' => '"El monitoreo de cámaras IP con analítica de IA revolucionó el control de acceso de nuestro centro de cómputo."', 'nombre' => 'Lucía Restrepo', 'cargo' => 'Directora de Seguridad, Global Data', 'estrellas' => 5],
+                ['texto' => '"Excelente trabajo en la reorganización y peinado de nuestro rack principal. Ahora la ventilación y el mantenimiento son muy sencillos."', 'nombre' => 'Mauricio Gómez', 'cargo' => 'Coordinador de TI, BanCrecimiento', 'estrellas' => 5],
+                ['texto' => '"La consultoría de redes de xcolnet optimizó la latencia de nuestras llamadas VoIP y videoconferencias corporativas de inmediato."', 'nombre' => 'Diana Patrias', 'cargo' => 'Gerente de Tecnología, InnovaSoft', 'estrellas' => 5],
+                ['texto' => '"Su soporte técnico 24/7 resolvió un cuello de botella crítico en nuestros switches en tiempo récord. El servicio es sobresaliente."', 'nombre' => 'Fernando Rojas', 'cargo' => 'Administrador de Red, ConnectPlus', 'estrellas' => 5],
+                ['texto' => '"La instalación de alarmas y cámaras perimetrales integradas con analítica inteligente superó todos nuestros requerimientos de seguridad."', 'nombre' => 'Sofía Valenzuela', 'cargo' => 'Jefa de Seguridad, SafeCore', 'estrellas' => 5],
+                ['texto' => '"Un socio tecnológico de total confianza. Cumplieron con todos los estándares internacionales y normativos de redes en nuestra obra."', 'nombre' => 'Alejandro Castro', 'cargo' => 'Director de Proyectos, BuildCorp', 'estrellas' => 5],
+                ['texto' => '"El control de acceso por reconocimiento facial y huella dactilar ha mejorado drásticamente la seguridad de nuestras bodegas."', 'nombre' => 'Camila López', 'cargo' => 'Gerente de IT, SmartLogistics', 'estrellas' => 5],
+                ['texto' => '"La configuración de enlaces redundantes y alta disponibilidad de red garantizó la continuidad del negocio para nuestros clientes."', 'nombre' => 'Juan Sebastián', 'cargo' => 'Administrador de Sistemas, CloudServices', 'estrellas' => 5],
+                ['texto' => '"Nuestra cobertura Wi-Fi para huéspedes mejoró notablemente gracias a los puntos de acceso que instaló y gestiona xcolnet."', 'nombre' => 'Natalia Herrera', 'cargo' => 'Directora de Compras, Hotel Plaza', 'estrellas' => 5],
+                ['texto' => '"Implementaron un cableado estructurado impecable en todas nuestras aulas y laboratorios. Su orden al peinar cables es excelente."', 'nombre' => 'Jorge Iván Ortiz', 'cargo' => 'Coordinador de Infraestructura, EduTech', 'estrellas' => 5],
+                ['texto' => '"Muy satisfechos con el soporte de fibra óptica y certificación de enlaces. Su equipo de ingenieros cuenta con el mejor equipo de prueba."', 'nombre' => 'Marcela Castro', 'cargo' => 'Líder de Redes, NetBuilders', 'estrellas' => 5],
+                ['texto' => '"Instalaron un sistema de monitoreo remoto en nuestras plantas de procesamiento que nos permite controlar todo desde una app centralizada."', 'nombre' => 'Felipe Restrepo', 'cargo' => 'Gerente de IT, AgroIndustrias', 'estrellas' => 5],
+                ['texto' => '"El control de acceso biométrico de alta precisión para áreas restringidas de nuestra clínica funciona a la perfección las 24 horas."', 'nombre' => 'Liliana Suárez', 'cargo' => 'Directora Operativa, MediClinics', 'estrellas' => 5],
+                ['texto' => '"Los ingenieros de xcolnet solucionaron de raíz los cortes intermitentes de nuestra red local. Su diagnóstico fue muy preciso y profesional."', 'nombre' => 'Gustavo Hernández', 'cargo' => 'Jefe de Sistemas, ComercioGlobal', 'estrellas' => 5],
+                ['texto' => '"El servicio preventivo programado que ofrecen mantiene nuestra red de tiendas operando sin caídas de facturación."', 'nombre' => 'Sandra Milena', 'cargo' => 'Gerente de Tecnología, RetailGroup', 'estrellas' => 5]
             ];
 
-            // Ordenar los testimonios aleatoriamente en cada recarga
-            shuffle($testimonios);
+            // Combinar testimonios: DB (del más nuevo al más antiguo) primero, seguidos por los estáticos
+            $testimonios = array_merge($testimoniosDb, $testimoniosEstaticos);
+
+            // Seleccionar 3 testimonios aleatorios iniciales para el carrusel de inicio
+            $testimoniosMezclados = $testimonios;
+            shuffle($testimoniosMezclados);
+            $tandaInicial = array_slice($testimoniosMezclados, 0, 3);
             ?>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <?php foreach (array_slice($testimonios, 0, 3) as $test): ?>
+
+            <div class="text-center mb-12">
+                <span class="font-label-md text-label-md text-primary uppercase tracking-[0.2em] mb-3 block font-semibold">CLIENTES SATISFECHOS</span>
+                <h2 class="font-headline-lg text-headline-lg text-2xl md:text-4xl font-bold text-on-surface mb-6">Confianza respaldada por resultados reales</h2>
+                <div class="flex flex-wrap items-center justify-center gap-3 mb-4">
+                    <button type="button" id="openCommentModalBtn" class="px-6 py-2.5 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary/95 transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        Dejar un Comentario
+                    </button>
+                    <button type="button" id="openAllCommentsBtn" class="px-6 py-2.5 bg-surface-container-high border border-outline-variant/40 text-on-surface font-label-md text-label-md rounded-lg hover:bg-primary hover:text-white transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
+                        <svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                        Ver Todos los Comentarios (<?php echo count($testimonios); ?>)
+                    </button>
+                </div>
+            </div>
+            
+            <div id="testimonios-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity duration-500 ease-in-out" style="opacity: 1;">
+                <?php foreach ($tandaInicial as $test): ?>
                     <div class="bg-white border border-outline-variant/30 rounded-xl p-8 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between">
                         <div>
                             <div class="flex gap-1 mb-4 text-amber-400">
@@ -412,6 +470,388 @@ if (empty($empresasMarquee)) {
                     </div>
                 <?php endforeach; ?>
             </div>
+
+            <!-- Modal para ver todos los comentarios -->
+            <div id="allCommentsModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 invisible transition-all duration-300 px-4 py-6">
+                <div class="bg-white border border-outline-variant/30 max-w-3xl w-full max-h-[88vh] rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-all duration-300 flex flex-col">
+                    <!-- Modal Header -->
+                    <div class="px-6 py-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+                        <div>
+                            <h3 class="font-bold text-xl text-on-surface mb-0.5 flex items-center gap-2">
+                                <svg class="w-6 h-6 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                                Todos los Comentarios
+                            </h3>
+                            <p class="text-xs text-on-surface-variant mb-0 font-mono">Ordenados del más reciente al más antiguo (Total: <?php echo count($testimonios); ?>)</p>
+                        </div>
+                        <button type="button" id="closeAllCommentsModalBtn" class="text-outline hover:text-on-surface p-1.5 rounded-full hover:bg-surface-container transition-colors border-0 bg-transparent flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Buscador dentro del modal -->
+                    <div class="px-6 py-3 bg-surface border-b border-outline-variant/20 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-outline shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <input type="text" id="searchAllCommentsInput" placeholder="Buscar por nombre, empresa o palabras clave..." class="w-full bg-transparent text-sm text-on-surface focus:outline-none placeholder:text-outline/70">
+                    </div>
+
+                    <!-- Lista scrollable de comentarios del más nuevo al más antiguo -->
+                    <div class="p-6 overflow-y-auto space-y-4 max-h-[60vh] bg-surface-container-low/30" id="allCommentsList">
+                        <?php foreach ($testimonios as $index => $test): ?>
+                            <div class="comment-item bg-white border border-outline-variant/30 rounded-xl p-5 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between" data-search="<?php echo htmlspecialchars(strtolower(($test['nombre'] ?? '') . ' ' . ($test['cargo'] ?? '') . ' ' . ($test['texto'] ?? ''))); ?>">
+                                <div>
+                                    <div class="flex items-center justify-between gap-2 mb-3">
+                                        <div class="flex gap-1 text-amber-400">
+                                            <?php for ($s = 0; $s < intval($test['estrellas'] ?? 5); $s++): ?>
+                                                <svg class="w-4 h-4 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <?php endfor; ?>
+                                        </div>
+                                        <?php if ($index < count($testimoniosDb)): ?>
+                                            <span class="px-2.5 py-0.5 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 text-[10px] font-mono font-bold rounded-full flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Comentario Reciente
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 text-[10px] font-mono font-medium rounded-full">
+                                                Cliente Verificado
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <p class="text-on-surface-variant font-body-md text-sm mb-4 italic leading-relaxed">
+                                        <?php echo htmlspecialchars($test['texto'] ?? ''); ?>
+                                    </p>
+                                </div>
+                                <div class="pt-3 border-t border-outline-variant/20 flex justify-between items-center">
+                                    <div>
+                                        <p class="font-bold text-on-surface text-sm mb-0"><?php echo htmlspecialchars($test['nombre'] ?? ''); ?></p>
+                                        <p class="text-xs text-outline mb-0"><?php echo htmlspecialchars($test['cargo'] ?? ''); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    
+                    <!-- Modal Footer -->
+                    <div class="px-6 py-3 border-t border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+                        <span class="text-xs text-outline font-mono">Mostrando del más reciente al más antiguo</span>
+                        <button type="button" id="closeAllCommentsModalFooterBtn" class="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-label-md font-semibold">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para dejar comentario -->
+            <div id="commentModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 invisible transition-all duration-300 px-4">
+                <div class="bg-white border border-outline-variant/30 max-w-md w-full rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-all duration-300 flex flex-col">
+                    <!-- Modal Header -->
+                    <div class="px-6 py-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+                        <h3 class="font-bold text-lg text-on-surface mb-0">Dejar un Comentario</h3>
+                        <button type="button" id="closeCommentModalBtn" class="text-outline hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors border-0 bg-transparent flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <!-- Modal Body -->
+                    <form id="commentForm" class="p-6 space-y-4 text-left">
+                        <input type="hidden" name="action" value="save_comment" />
+                        <div>
+                            <label class="block font-medium text-label-md text-on-surface-variant mb-1" for="comment-nombre">Nombre Completo <span class="text-error">*</span></label>
+                            <input type="text" id="comment-nombre" name="nombre" required class="w-full px-4 py-2 border border-outline-variant/60 rounded-lg bg-surface text-on-surface focus:outline-none focus:border-primary text-body-md" placeholder="Ej. Carlos Mendoza" />
+                        </div>
+                        <div>
+                            <label class="block font-medium text-label-md text-on-surface-variant mb-1" for="comment-cargo">Cargo y Empresa <span class="text-error">*</span></label>
+                            <input type="text" id="comment-cargo" name="cargo" required class="w-full px-4 py-2 border border-outline-variant/60 rounded-lg bg-surface text-on-surface focus:outline-none focus:border-primary text-body-md" placeholder="Ej. Director de IT, TechCorp" />
+                        </div>
+                        <div>
+                            <label class="block font-medium text-label-md text-on-surface-variant mb-1" for="comment-texto">Comentario <span class="text-error">*</span></label>
+                            <textarea id="comment-texto" name="texto" rows="3" required class="w-full px-4 py-2 border border-outline-variant/60 rounded-lg bg-surface text-on-surface focus:outline-none focus:border-primary text-body-md resize-none" placeholder="Escribe aquí tu testimonio sobre los servicios..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block font-medium text-label-md text-on-surface-variant mb-2">Calificación <span class="text-error">*</span></label>
+                            <div class="flex gap-2 text-2xl cursor-pointer" id="modal-star-selector">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <svg class="w-8 h-8 text-amber-400 select-star cursor-pointer transition-transform hover:scale-110" data-rating="<?php echo $i; ?>" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <?php endfor; ?>
+                            </div>
+                            <input type="hidden" name="estrellas" id="input-estrellas" value="5" />
+                        </div>
+                        <!-- Modal Footer -->
+                        <div class="pt-4 flex justify-end gap-3 border-t border-outline-variant/10 mt-6">
+                            <button type="button" id="cancelCommentBtn" class="px-5 py-2 border border-outline-variant/60 rounded-lg hover:bg-surface-container transition-colors text-label-md text-on-surface-variant">Cancelar</button>
+                            <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-label-md font-semibold">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Notificación flotante de éxito -->
+            <div id="toastSuccess" class="fixed bottom-8 left-8 z-[110] bg-emerald-500 text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+                <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                <span class="font-medium text-body-md" id="toastMessage">¡Comentario registrado con éxito!</span>
+            </div>
+
+            <script>
+            const testimoniosData = <?php echo json_encode($testimonios); ?>;
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                const container = document.getElementById('testimonios-container');
+                const commentModal = document.getElementById('commentModal');
+                const openModalBtn = document.getElementById('openCommentModalBtn');
+                const closeModalBtn = document.getElementById('closeCommentModalBtn');
+                const cancelBtn = document.getElementById('cancelCommentBtn');
+                const form = document.getElementById('commentForm');
+                const starSelector = document.getElementById('modal-star-selector');
+                const starsInput = document.getElementById('input-estrellas');
+                const toast = document.getElementById('toastSuccess');
+
+                if (!container || !testimoniosData || testimoniosData.length === 0) return;
+
+                function escapeHtml(str) {
+                    return str
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;")
+                        .replace(/'/g, "&#039;");
+                }
+
+                // Rotador automático
+                let rotarInterval;
+                function rotarTestimonios() {
+                    container.style.opacity = '0';
+                    setTimeout(() => {
+                        const mezclados = [...testimoniosData].sort(() => 0.5 - Math.random());
+                        const seleccionados = mezclados.slice(0, 3);
+                        
+                        let html = '';
+                        seleccionados.forEach(test => {
+                            let estrellasHtml = '';
+                            for (let s = 0; s < test.estrellas; s++) {
+                                estrellasHtml += `<svg class="w-5 h-5 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+                            }
+                            
+                            html += `
+                                <div class="bg-white border border-outline-variant/30 rounded-xl p-8 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex gap-1 mb-4 text-amber-400">
+                                            ${estrellasHtml}
+                                        </div>
+                                        <p class="text-on-surface-variant font-body-md mb-6 italic leading-relaxed">${escapeHtml(test.texto)}</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-on-surface mb-0">${escapeHtml(test.nombre)}</p>
+                                        <p class="text-label-md text-outline mb-0">${escapeHtml(test.cargo)}</p>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        container.innerHTML = html;
+                        container.style.opacity = '1';
+                    }, 500);
+                }
+
+                function reiniciarIntervalo() {
+                    clearInterval(rotarInterval);
+                    rotarInterval = setInterval(rotarTestimonios, 8000);
+                }
+                
+                reiniciarIntervalo();
+
+                // Manejo de Modal Dejar Comentario
+                function openModal() {
+                    commentModal.classList.remove('invisible', 'opacity-0');
+                    commentModal.classList.add('visible', 'opacity-100');
+                    commentModal.firstElementChild.classList.remove('scale-95');
+                    commentModal.firstElementChild.classList.add('scale-100');
+                    clearInterval(rotarInterval); // Pausar rotación mientras se escribe
+                }
+
+                function closeModal() {
+                    commentModal.classList.remove('visible', 'opacity-100');
+                    commentModal.classList.add('invisible', 'opacity-0');
+                    commentModal.firstElementChild.classList.remove('scale-100');
+                    commentModal.firstElementChild.classList.add('scale-95');
+                    form.reset();
+                    setStars(5);
+                    reiniciarIntervalo(); // Reanudar rotación
+                }
+
+                if (openModalBtn) openModalBtn.addEventListener('click', openModal);
+                if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+                if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+                // Manejo de Modal Ver Todos los Comentarios
+                const allCommentsModal = document.getElementById('allCommentsModal');
+                const openAllCommentsBtn = document.getElementById('openAllCommentsBtn');
+                const closeAllCommentsModalBtn = document.getElementById('closeAllCommentsModalBtn');
+                const closeAllCommentsModalFooterBtn = document.getElementById('closeAllCommentsModalFooterBtn');
+                const searchAllCommentsInput = document.getElementById('searchAllCommentsInput');
+
+                function openAllCommentsModal() {
+                    if (!allCommentsModal) return;
+                    allCommentsModal.classList.remove('invisible', 'opacity-0');
+                    allCommentsModal.classList.add('visible', 'opacity-100');
+                    allCommentsModal.firstElementChild.classList.remove('scale-95');
+                    allCommentsModal.firstElementChild.classList.add('scale-100');
+                    clearInterval(rotarInterval);
+                }
+
+                function closeAllCommentsModal() {
+                    if (!allCommentsModal) return;
+                    allCommentsModal.classList.remove('visible', 'opacity-100');
+                    allCommentsModal.classList.add('invisible', 'opacity-0');
+                    allCommentsModal.firstElementChild.classList.remove('scale-100');
+                    allCommentsModal.firstElementChild.classList.add('scale-95');
+                    if (searchAllCommentsInput) {
+                        searchAllCommentsInput.value = '';
+                        searchAllCommentsInput.dispatchEvent(new Event('input'));
+                    }
+                    reiniciarIntervalo();
+                }
+
+                if (openAllCommentsBtn) openAllCommentsBtn.addEventListener('click', openAllCommentsModal);
+                if (closeAllCommentsModalBtn) closeAllCommentsModalBtn.addEventListener('click', closeAllCommentsModal);
+                if (closeAllCommentsModalFooterBtn) closeAllCommentsModalFooterBtn.addEventListener('click', closeAllCommentsModal);
+
+                // Auto-abrir modal de comentarios si viene en la URL
+                if (window.location.hash === '#allCommentsModal' || new URLSearchParams(window.location.search).get('modal') === 'comentarios') {
+                    setTimeout(openAllCommentsModal, 300);
+                }
+
+                // Filtrado en vivo de comentarios por búsqueda
+                if (searchAllCommentsInput) {
+                    searchAllCommentsInput.addEventListener('input', function(e) {
+                        const term = e.target.value.toLowerCase().trim();
+                        const items = document.querySelectorAll('#allCommentsList .comment-item');
+                        items.forEach(item => {
+                            const searchData = item.getAttribute('data-search') || '';
+                            if (!term || searchData.includes(term)) {
+                                item.style.display = 'flex';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                    });
+                }
+
+                // Selector de estrellas
+                function setStars(rating) {
+                    starsInput.value = rating;
+                    const stars = starSelector.querySelectorAll('.select-star');
+                    stars.forEach((star, index) => {
+                        if (index < rating) {
+                            star.classList.remove('text-outline-variant');
+                            star.classList.add('text-amber-400');
+                        } else {
+                            star.classList.remove('text-amber-400');
+                            star.classList.add('text-outline-variant');
+                        }
+                    });
+                }
+
+                if (starSelector) {
+                    starSelector.addEventListener('click', function(e) {
+                        const star = e.target.closest('.select-star');
+                        if (star) {
+                            const rating = parseInt(star.getAttribute('data-rating'));
+                            setStars(rating);
+                        }
+                    });
+                }
+
+                // Mostrar Toast
+                function showToast(msg) {
+                    const toastMsg = document.getElementById('toastMessage');
+                    if (toastMsg) toastMsg.innerText = msg;
+                    toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+                    toast.classList.add('translate-y-0', 'opacity-100');
+                    
+                    setTimeout(() => {
+                        toast.classList.remove('translate-y-0', 'opacity-100');
+                        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+                    }, 4000);
+                }
+
+                // Enviar formulario por AJAX
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const formData = new FormData(form);
+
+                        fetch('index.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Añadir testimonio al pool local en primer lugar
+                                testimoniosData.unshift(data.comment);
+                                
+                                // Cerrar modal y mostrar éxito
+                                closeModal();
+                                showToast('¡Gracias! Tu comentario ha sido registrado con éxito.');
+                                
+                                // Mostrar inmediatamente el nuevo comentario cargado
+                                container.style.opacity = '0';
+                                setTimeout(() => {
+                                    let estrellasHtml = '';
+                                    for (let s = 0; s < data.comment.estrellas; s++) {
+                                        estrellasHtml += `<svg class="w-5 h-5 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+                                    }
+                                    
+                                    // Renderizar el nuevo comentario y los 2 siguientes de la tanda mezclada
+                                    const otros = [...testimoniosData].slice(1, 3);
+                                    let html = `
+                                        <div class="bg-white border border-primary/20 rounded-xl p-8 shadow-md hover:shadow-lg transition-all text-left flex flex-col justify-between border-l-4 border-l-primary scale-100 ring-2 ring-primary/10">
+                                            <div>
+                                                <div class="flex gap-1 mb-4 text-amber-400">
+                                                    ${estrellasHtml}
+                                                </div>
+                                                <p class="text-on-surface-variant font-body-md mb-6 italic leading-relaxed">${escapeHtml(data.comment.texto)}</p>
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-on-surface mb-0">${escapeHtml(data.comment.nombre)}</p>
+                                                <p class="text-label-md text-outline mb-0">${escapeHtml(data.comment.cargo)}</p>
+                                            </div>
+                                        </div>
+                                    `;
+                                    
+                                    otros.forEach(test => {
+                                        let estrellasOtros = '';
+                                        for (let s = 0; s < test.estrellas; s++) {
+                                            estrellasOtros += `<svg class="w-5 h-5 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+                                        }
+                                        html += `
+                                            <div class="bg-white border border-outline-variant/30 rounded-xl p-8 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between">
+                                                <div>
+                                                    <div class="flex gap-1 mb-4 text-amber-400">
+                                                        ${estrellasOtros}
+                                                    </div>
+                                                    <p class="text-on-surface-variant font-body-md mb-6 italic leading-relaxed">${escapeHtml(test.texto)}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="font-bold text-on-surface mb-0">${escapeHtml(test.nombre)}</p>
+                                                    <p class="text-label-md text-outline mb-0">${escapeHtml(test.cargo)}</p>
+                                                </div>
+                                            </div>
+                                        `;
+                                    });
+                                    
+                                    container.innerHTML = html;
+                                    container.style.opacity = '1';
+                                }, 500);
+                            } else {
+                                alert(data.message || 'Ocurrió un error al registrar el comentario.');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                            alert('No se pudo establecer conexión con el servidor.');
+                        });
+                    });
+                }
+            });
+            </script>
+        </div>
+    </section>
         </div>
     </section>
 
@@ -422,8 +862,8 @@ if (empty($empresasMarquee)) {
                 <h2 class="font-display text-display text-3xl md:text-5xl font-bold text-on-surface">¿Listo para fortalecer su infraestructura?</h2>
                 <p class="font-body-lg text-body-lg text-on-surface-variant text-base md:text-lg">Únase a las empresas que confían su conectividad crítica a xcolnet. Soluciones robustas y soporte técnico de primer nivel.</p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
-                    <a href="proyecto.php" class="w-full sm:w-auto px-10 py-5 bg-on-surface text-surface font-headline-md text-headline-md rounded-lg active:scale-95 transition-all shadow-xl no-underline font-semibold">Hablar con un experto</a>
-                    <a href="proyecto.php" class="font-label-md text-headline-md text-primary flex items-center gap-2 group no-underline font-medium hover:underline">
+                    <a href="proyecto.php" class="w-full sm:w-auto px-7 py-3.5 bg-on-surface text-surface text-base md:text-lg rounded-lg active:scale-95 transition-all shadow-md no-underline font-semibold text-center">Hablar con un experto</a>
+                    <a href="proyecto.php" class="font-label-md text-base md:text-lg text-primary flex items-center gap-2 group no-underline font-medium hover:underline">
                         Ver portafolio de proyectos
                         <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                     </a>

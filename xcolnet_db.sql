@@ -31,6 +31,7 @@ CREATE TABLE `pqrs` (
   `Mensaje` text NOT NULL,
   `Estado` varchar(50) DEFAULT 'Pendiente',
   `FechaCreacion` datetime NOT NULL,
+  `AceptoPoliticaDatos` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -41,7 +42,7 @@ CREATE TABLE `pqrs` (
 
 LOCK TABLES `pqrs` WRITE;
 /*!40000 ALTER TABLE `pqrs` DISABLE KEYS */;
-INSERT INTO `pqrs` VALUES (1,'Andres Prueba','andres.prueba@ejemplo.com','3001234567','Petición','Mensaje de prueba','En trámite','2026-06-29 16:43:25');
+INSERT INTO `pqrs` VALUES (1,'Andres Prueba','andres.prueba@ejemplo.com','3001234567','Petición','Mensaje de prueba','En trámite','2026-06-29 16:43:25',1);
 /*!40000 ALTER TABLE `pqrs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -63,6 +64,7 @@ CREATE TABLE `proyectos` (
   `Descripcion` text NOT NULL,
   `Estado` varchar(50) DEFAULT 'Pendiente',
   `FechaCreacion` datetime NOT NULL,
+  `AceptoPoliticaDatos` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -165,6 +167,21 @@ INSERT INTO `empresas` VALUES
 (6,'INFRA_STRUC',NULL,'font-bold',6,1,NOW());
 /*!40000 ALTER TABLE `empresas` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `testimonios`
+--
+
+DROP TABLE IF EXISTS `testimonios`;
+CREATE TABLE `testimonios` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Nombre` varchar(256) NOT NULL,
+  `Cargo` varchar(256) NOT NULL,
+  `Texto` text NOT NULL,
+  `Estrellas` int(11) NOT NULL,
+  `FechaCreacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
