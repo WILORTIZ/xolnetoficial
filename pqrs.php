@@ -29,22 +29,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             try {
                 if ($pdo instanceof PDO) {
-                    $stmt = $pdo->prepare("INSERT INTO Pqrs (Nombre, Email, Telefono, Tipo, Mensaje, Estado, FechaCreacion, AceptoPoliticaDatos) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                     $estado = "Pendiente";
                     $fecha = date('Y-m-d H:i:s');
                     $aceptoValor = 1;
                     $tipoFinal = "[$sector] $tipo";
                     
-                    $stmt->execute([$nombre, $email, $telefono, $tipoFinal, $mensaje, $estado, $fecha, $aceptoValor]);
-                    $pqrsId = $pdo->lastInsertId();
+                    // Resilient insert: Try 'pqrs' table with AceptoPoliticaDatos, then fall back without column, then try 'Pqrs'
+                    $inserted = false;
+                    $tableVariants = ['pqrs', 'Pqrs'];
                     
-                    $successMessage = "¡Tu solicitud ha sido radicada con éxito! Tu número de radicado es: <strong>#PQRS-$pqrsId</strong>. Nos pondremos en contacto contigo lo antes posible.";
+                    foreach ($tableVariants as $table) {
+                        try {
+                            $stmt = $pdo->prepare("INSERT INTO $table (Nombre, Email, Telefono, Tipo, Mensaje, Estado, FechaCreacion, AceptoPoliticaDatos) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                            $stmt->execute([$nombre, $email, $telefono, $tipoFinal, $mensaje, $estado, $fecha, $aceptoValor]);
+                            $inserted = true;
+                            break;
+                        } catch (PDOException $eCol) {
+                            try {
+                                $stmt = $pdo->prepare("INSERT INTO $table (Nombre, Email, Telefono, Tipo, Mensaje, Estado, FechaCreacion) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                                $stmt->execute([$nombre, $email, $telefono, $tipoFinal, $mensaje, $estado, $fecha]);
+                                $inserted = true;
+                                break;
+                            } catch (PDOException $eSub) {
+                                // Try next table variant
+                            }
+                        }
+                    }
+
+                    if ($inserted) {
+                        $pqrsId = $pdo->lastInsertId();
+                        $successMessage = "¡Tu solicitud ha sido radicada con éxito! Tu número de radicado es: <strong>#PQRS-$pqrsId</strong>. Nos pondremos en contacto contigo lo antes posible.";
+                    } else {
+                        $errorMessage = "Error al guardar tu solicitud en la base de datos. Por favor reintenta.";
+                    }
                 } else {
                     $errorMessage = "No hay conexión a la base de datos para radicar la PQRS.";
                 }
-            } catch (PDOException $e) {
+            } catch (Exception $e) {
                 error_log("Error en pqrs.php: " . $e->getMessage());
-                $errorMessage = "Error al procesar tu solicitud. Por favor intente más tarde.";
+                $errorMessage = "Error al procesar tu solicitud: " . htmlspecialchars($e->getMessage());
             }
         }
     }

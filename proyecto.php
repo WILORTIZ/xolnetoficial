@@ -26,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             if ($pdo instanceof PDO) {
-                $stmt = $pdo->prepare("INSERT INTO Proyectos (NombreCliente, Email, Telefono, NombreEmpresa, TipoProyecto, PresupuestoEstimado, Descripcion, Estado, FechaCreacion, AceptoPoliticaDatos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $estado = "Pendiente";
                 $fecha = date('Y-m-d H:i:s');
                 $aceptoValor = 1;
@@ -34,16 +33,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $empresaFinal = ($sector === 'Hogar') ? "Hogar ($nombreCliente)" : ($nombreEmpresa ?: 'Empresa N/A');
                 $tipoFinal = "[$sector] $tipoProyecto";
 
-                $stmt->execute([$nombreCliente, $email, $telefono, $empresaFinal, $tipoFinal, $presupuestoEstimado, $descripcion, $estado, $fecha, $aceptoValor]);
-                $proyectoId = $pdo->lastInsertId();
-                
-                $successMessage = "¡Excelente! Tu solicitud de proyecto ha sido registrada con éxito con el código de seguimiento: <strong>#$proyectoId</strong>. Un especialista técnico se pondrá en contacto contigo a la brevedad.";
+                $inserted = false;
+                $tableVariants = ['proyectos', 'Proyectos'];
+
+                foreach ($tableVariants as $table) {
+                    try {
+                        $stmt = $pdo->prepare("INSERT INTO $table (NombreCliente, Email, Telefono, NombreEmpresa, TipoProyecto, PresupuestoEstimado, Descripcion, Estado, FechaCreacion, AceptoPoliticaDatos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$nombreCliente, $email, $telefono, $empresaFinal, $tipoFinal, $presupuestoEstimado, $descripcion, $estado, $fecha, $aceptoValor]);
+                        $inserted = true;
+                        break;
+                    } catch (PDOException $eCol) {
+                        try {
+                            $stmt = $pdo->prepare("INSERT INTO $table (NombreCliente, Email, Telefono, NombreEmpresa, TipoProyecto, PresupuestoEstimado, Descripcion, Estado, FechaCreacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                            $stmt->execute([$nombreCliente, $email, $telefono, $empresaFinal, $tipoFinal, $presupuestoEstimado, $descripcion, $estado, $fecha]);
+                            $inserted = true;
+                            break;
+                        } catch (PDOException $eSub) {
+                            // Try next table variant
+                        }
+                    }
+                }
+
+                if ($inserted) {
+                    $proyectoId = $pdo->lastInsertId();
+                    $successMessage = "¡Excelente! Tu solicitud de proyecto ha sido registrada con éxito con el código de seguimiento: <strong>#$proyectoId</strong>. Un especialista técnico se pondrá en contacto contigo a la brevedad.";
+                } else {
+                    $errorMessage = "Error al guardar la solicitud de proyecto en la base de datos.";
+                }
             } else {
                 $errorMessage = "No hay conexión a la base de datos para registrar el proyecto.";
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             error_log("Error en proyecto.php: " . $e->getMessage());
-            $errorMessage = "Error al registrar la solicitud de proyecto. Por favor intente más tarde.";
+            $errorMessage = "Error al registrar la solicitud de proyecto: " . htmlspecialchars($e->getMessage());
         }
     }
 }
