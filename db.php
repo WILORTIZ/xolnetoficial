@@ -13,11 +13,15 @@ $db_hosts = [getenv('DB_HOST') ?: 'localhost', '127.0.0.1'];
 
 // Priorizar combinaciones locales más comunes de XAMPP y cPanel
 $db_configs = [
-    ['user' => $env_user, 'pass' => '', 'db' => $env_name],
     ['user' => $env_user, 'pass' => $env_pass, 'db' => $env_name],
+    ['user' => 'y21a91r3ufvk_ANDRES', 'pass' => '94010521240Aa@', 'db' => 'y21a91r3ufvk_xcolnet_db'],
+    ['user' => 'y21a91r3ufvk_ANDRES', 'pass' => '94010521240Aa@', 'db' => 'xcolnet_db'],
+    ['user' => 'y21a91r3ufvk_admin', 'pass' => '94010521240Aa@', 'db' => 'y21a91r3ufvk_xcolnet_db'],
+    ['user' => 'y21a91r3ufvk_xcolnet', 'pass' => '94010521240Aa@', 'db' => 'y21a91r3ufvk_xcolnet_db'],
+    ['user' => $env_user, 'pass' => '', 'db' => $env_name],
     ['user' => 'root', 'pass' => '', 'db' => 'xcolnet_db'],
+    ['user' => 'root', 'pass' => '94010521240Aa@', 'db' => 'xcolnet_db'],
     ['user' => 'root', 'pass' => '', 'db' => 'y21a91r3ufvk_xcolnet_db'],
-    ['user' => 'y21a91r3ufvk_ANDRES', 'pass' => $env_pass, 'db' => 'y21a91r3ufvk_xcolnet_db'],
 ];
 
 $connected = false;
@@ -35,7 +39,7 @@ foreach ($db_hosts as $host) {
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
-                    PDO::ATTR_TIMEOUT => 1,
+                    PDO::ATTR_TIMEOUT => 5,
                 ]
             );
             if (!defined('DB_HOST')) define('DB_HOST', $host);
