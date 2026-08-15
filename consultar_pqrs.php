@@ -10,9 +10,15 @@ if (!empty($searchId)) {
     $searched = true;
     try {
         if ($pdo instanceof PDO) {
-            $stmt = $pdo->prepare("SELECT * FROM Pqrs WHERE Id = ?");
-            $stmt->execute([$searchId]);
-            $pqrs = $stmt->fetch();
+            $stmt = null;
+            try {
+                $stmt = $pdo->prepare("SELECT * FROM Pqrs WHERE Id = ?");
+                $stmt->execute([$searchId]);
+            } catch (PDOException $e) {
+                $stmt = $pdo->prepare("SELECT * FROM pqrs WHERE Id = ?");
+                $stmt->execute([$searchId]);
+            }
+            $pqrs = $stmt ? $stmt->fetch() : null;
             
             if (!$pqrs) {
                 $errorMessage = "No se encontró ninguna solicitud PQRS registrada con el radicado <b>#$searchId</b>.";

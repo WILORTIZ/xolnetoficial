@@ -16,6 +16,8 @@
 test_*.py
 acme_*.py
 debug_*.php
+list_tables.php
+scratch/
 *.log
 
 # Carpetas del IDE y temporales

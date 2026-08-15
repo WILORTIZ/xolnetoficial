@@ -10,9 +10,15 @@ if (!empty($searchId)) {
     $searched = true;
     try {
         if ($pdo instanceof PDO) {
-            $stmt = $pdo->prepare("SELECT * FROM Proyectos WHERE Id = ?");
-            $stmt->execute([$searchId]);
-            $proyecto = $stmt->fetch();
+            $stmt = null;
+            try {
+                $stmt = $pdo->prepare("SELECT * FROM Proyectos WHERE Id = ?");
+                $stmt->execute([$searchId]);
+            } catch (PDOException $e) {
+                $stmt = $pdo->prepare("SELECT * FROM proyectos WHERE Id = ?");
+                $stmt->execute([$searchId]);
+            }
+            $proyecto = $stmt ? $stmt->fetch() : null;
             
             if (!$proyecto) {
                 $errorMessage = "No se encontró ningún proyecto registrado con el código <b>#$searchId</b>.";
