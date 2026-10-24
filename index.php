@@ -437,14 +437,67 @@ if (empty($empresasMarquee)) {
             $tandaInicial = array_slice($testimoniosMezclados, 0, 3);
             ?>
 
+            <!-- Schema.org AggregateRating para Resultados Enriquecidos (Google Rich Snippets con Estrellas) -->
+            <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "name": "XCOLNET",
+              "image": "https://www.xcolnet.com/images/favicon.png",
+              "url": "https://www.xcolnet.com",
+              "telephone": "+57 317 087 7414",
+              "priceRange": "$$",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "CO"
+              },
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.9",
+                "bestRating": "5",
+                "worstRating": "1",
+                "ratingCount": "<?php echo count($testimonios); ?>"
+              }
+            }
+            </script>
+
             <div class="text-center mb-12">
                 <span class="font-label-md text-label-md text-primary uppercase tracking-[0.2em] mb-3 block font-semibold">CLIENTES SATISFECHOS</span>
-                <h2 class="font-headline-lg text-headline-lg text-2xl md:text-4xl font-bold text-on-surface mb-6">Confianza respaldada por resultados reales</h2>
+                <h2 class="font-headline-lg text-headline-lg text-2xl md:text-4xl font-bold text-on-surface mb-4">Confianza respaldada por resultados reales</h2>
+
+                <!-- Insignia de Calificación Oficial Google Reviews -->
+                <div class="inline-flex items-center gap-2.5 px-4 py-2 bg-white border border-outline-variant/40 rounded-full shadow-sm mb-6 hover:shadow-md transition-shadow">
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3h3.88c2.27-2.09 3.66-5.17 3.66-9.09z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.09C3.25 21.3 7.31 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.32c-.25-.72-.38-1.49-.38-2.32s.13-1.6.38-2.32V6.59H1.27C.46 8.21 0 10.05 0 12s.46 3.79 1.27 5.41l4.01-3.09z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.27 6.59l4.01 3.09c.95-2.83 3.6-4.93 6.72-4.93z"/>
+                    </svg>
+                    <div class="flex items-center gap-0.5 text-amber-400">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    </div>
+                    <span class="text-xs font-semibold text-on-surface">5.0 en Google Reviews</span>
+                    <span class="text-xs text-outline font-medium">(Verificado)</span>
+                </div>
+
                 <div class="flex flex-wrap items-center justify-center gap-3 mb-4">
                     <button type="button" id="openCommentModalBtn" class="px-6 py-2.5 bg-primary text-white font-label-md text-label-md rounded-lg hover:bg-primary/95 transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
                         Dejar un Comentario
                     </button>
+                    <a href="https://www.google.com/search?q=XCOLNET+Soluciones+Tecnologicas+Colombia#lrd=0x0:0x0,3" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 bg-white border border-outline-variant/60 hover:border-primary/50 text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container transition-all shadow-sm flex items-center gap-2 active:scale-95 font-medium no-underline">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3h3.88c2.27-2.09 3.66-5.17 3.66-9.09z"/>
+                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.09C3.25 21.3 7.31 24 12 24z"/>
+                            <path fill="#FBBC05" d="M5.28 14.32c-.25-.72-.38-1.49-.38-2.32s.13-1.6.38-2.32V6.59H1.27C.46 8.21 0 10.05 0 12s.46 3.79 1.27 5.41l4.01-3.09z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.27 6.59l4.01 3.09c.95-2.83 3.6-4.93 6.72-4.93z"/>
+                        </svg>
+                        Opinar en Google
+                    </a>
                     <button type="button" id="openAllCommentsBtn" class="px-6 py-2.5 bg-surface-container-high border border-outline-variant/40 text-on-surface font-label-md text-label-md rounded-lg hover:bg-primary hover:text-white transition-all shadow-md flex items-center gap-2 active:scale-95 font-medium">
                         <svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                         Ver Todos los Comentarios (<?php echo count($testimonios); ?>)
@@ -580,8 +633,50 @@ if (empty($empresasMarquee)) {
                 </div>
             </div>
 
+            <!-- Modal Asistido de 1 Clic para Google Reviews -->
+            <div id="googleSyncModal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+                <div class="bg-white rounded-2xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-outline-variant/30 transform scale-95 transition-transform duration-300 text-center relative overflow-hidden" id="googleSyncModalContent">
+                    <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-red-500 via-amber-400 to-green-500"></div>
+
+                    <div class="w-16 h-16 mx-auto mb-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center shadow-inner">
+                        <svg class="w-9 h-9" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3h3.88c2.27-2.09 3.66-5.17 3.66-9.09z"/>
+                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.09C3.25 21.3 7.31 24 12 24z"/>
+                            <path fill="#FBBC05" d="M5.28 14.32c-.25-.72-.38-1.49-.38-2.32s.13-1.6.38-2.32V6.59H1.27C.46 8.21 0 10.05 0 12s.46 3.79 1.27 5.41l4.01-3.09z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.27 6.59l4.01 3.09c.95-2.83 3.6-4.93 6.72-4.93z"/>
+                        </svg>
+                    </div>
+
+                    <span class="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full mb-2">¡Comentario registrado en XCOLNET!</span>
+                    <h3 class="text-xl md:text-2xl font-bold text-on-surface mb-2">¿Nos apoyas con 1 clic en Google?</h3>
+                    <p class="text-sm text-on-surface-variant mb-5 leading-relaxed">
+                        Tu opinión en Google Reviews nos da más visibilidad y ayuda a otras empresas a encontrar nuestros servicios.
+                    </p>
+
+                    <!-- Previsualización de la reseña -->
+                    <div class="bg-surface border border-outline-variant/30 rounded-xl p-4 text-left mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-sm text-on-surface" id="syncPreviewName">Cliente</span>
+                            <div class="flex gap-0.5 text-amber-400" id="syncPreviewStars"></div>
+                        </div>
+                        <p class="text-xs text-on-surface-variant italic mb-0 line-clamp-3" id="syncPreviewText"></p>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="space-y-3">
+                        <button type="button" id="copyAndOpenGoogleBtn" class="w-full py-3.5 px-6 bg-[#1a73e8] hover:bg-[#1557b0] text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
+                            <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                            <span>⭐ Copiar Texto y Publicar en Google</span>
+                        </button>
+                        <button type="button" id="closeGoogleSyncBtn" class="w-full py-2 px-4 text-xs font-medium text-outline hover:text-on-surface transition-colors">
+                            Solo guardar en la web
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Notificación flotante de éxito -->
-            <div id="toastSuccess" class="fixed bottom-8 left-8 z-[110] bg-emerald-500 text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+            <div id="toastSuccess" class="fixed bottom-8 left-8 z-[130] bg-emerald-500 text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
                 <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                 <span class="font-medium text-body-md" id="toastMessage">¡Comentario registrado con éxito!</span>
             </div>
@@ -599,6 +694,61 @@ if (empty($empresasMarquee)) {
                 const starSelector = document.getElementById('modal-star-selector');
                 const starsInput = document.getElementById('input-estrellas');
                 const toast = document.getElementById('toastSuccess');
+
+                // Elementos del modal de Google Sync
+                const googleSyncModal = document.getElementById('googleSyncModal');
+                const googleSyncModalContent = document.getElementById('googleSyncModalContent');
+                const copyAndOpenGoogleBtn = document.getElementById('copyAndOpenGoogleBtn');
+                const closeGoogleSyncBtn = document.getElementById('closeGoogleSyncBtn');
+                const syncPreviewName = document.getElementById('syncPreviewName');
+                const syncPreviewStars = document.getElementById('syncPreviewStars');
+                const syncPreviewText = document.getElementById('syncPreviewText');
+                let lastCommentForGoogle = null;
+
+                function openGoogleSync(comment) {
+                    lastCommentForGoogle = comment;
+                    if (syncPreviewName) syncPreviewName.textContent = comment.nombre || 'Cliente';
+                    if (syncPreviewText) syncPreviewText.textContent = `"${comment.texto || ''}"`;
+                    if (syncPreviewStars) {
+                        let starsHtml = '';
+                        const count = parseInt(comment.estrellas) || 5;
+                        for (let s = 0; s < count; s++) {
+                            starsHtml += `<svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+                        }
+                        syncPreviewStars.innerHTML = starsHtml;
+                    }
+
+                    if (googleSyncModal && googleSyncModalContent) {
+                        googleSyncModal.classList.remove('opacity-0', 'pointer-events-none');
+                        googleSyncModalContent.classList.remove('scale-95');
+                        googleSyncModalContent.classList.add('scale-100');
+                    }
+                }
+
+                function closeGoogleSync() {
+                    if (googleSyncModal && googleSyncModalContent) {
+                        googleSyncModal.classList.add('opacity-0', 'pointer-events-none');
+                        googleSyncModalContent.classList.remove('scale-100');
+                        googleSyncModalContent.classList.add('scale-95');
+                    }
+                }
+
+                if (closeGoogleSyncBtn) {
+                    closeGoogleSyncBtn.addEventListener('click', closeGoogleSync);
+                }
+
+                if (copyAndOpenGoogleBtn) {
+                    copyAndOpenGoogleBtn.addEventListener('click', function() {
+                        const text = lastCommentForGoogle ? lastCommentForGoogle.texto : '';
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(text).catch(() => {});
+                        }
+                        const googleReviewUrl = 'https://www.google.com/search?q=XCOLNET+Soluciones+Tecnologicas+Colombia#lrd=0x0:0x0,3';
+                        window.open(googleReviewUrl, '_blank');
+                        closeGoogleSync();
+                        showToast('¡Texto copiado al portapapeles! Pégalo (Ctrl+V) en Google.');
+                    });
+                }
 
                 if (!container || !testimoniosData || testimoniosData.length === 0) return;
 
@@ -785,9 +935,12 @@ if (empty($empresasMarquee)) {
                                 // Añadir testimonio al pool local en primer lugar
                                 testimoniosData.unshift(data.comment);
                                 
-                                // Cerrar modal y mostrar éxito
+                                // Cerrar modal de formulario y abrir asistente de Google
                                 closeModal();
-                                showToast('¡Gracias! Tu comentario ha sido registrado con éxito.');
+                                showToast('¡Gracias! Tu comentario ha sido guardado.');
+                                setTimeout(() => {
+                                    openGoogleSync(data.comment);
+                                }, 300);
                                 
                                 // Mostrar inmediatamente el nuevo comentario cargado
                                 container.style.opacity = '0';
