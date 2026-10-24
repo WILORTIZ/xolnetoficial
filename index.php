@@ -30,8 +30,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             ]]);
             exit;
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'message' => 'Error al guardar en base de datos: ' . $e->getMessage()]);
-            exit;
+            // Auto-crear la tabla si no existe en la BD de producción y reintentar inmediatamente
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS `testimonios` (
+                  `Id` int(11) NOT NULL AUTO_INCREMENT,
+                  `Nombre` varchar(256) NOT NULL,
+                  `Cargo` varchar(256) NOT NULL,
+                  `Texto` text NOT NULL,
+                  `Estrellas` int(11) NOT NULL,
+                  `FechaCreacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`Id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+
+                $stmt = $pdo->prepare("INSERT INTO testimonios (Nombre, Cargo, Texto, Estrellas) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$nombre, $cargo, '"' . $texto . '"', $estrellas]);
+                echo json_encode(['success' => true, 'comment' => [
+                    'nombre' => $nombre,
+                    'cargo' => $cargo,
+                    'texto' => '"' . $texto . '"',
+                    'estrellas' => $estrellas
+                ]]);
+                exit;
+            } catch (PDOException $e2) {
+                echo json_encode(['success' => false, 'message' => 'Error al guardar en base de datos: ' . $e2->getMessage()]);
+                exit;
+            }
         }
     } else {
         echo json_encode(['success' => true, 'comment' => [
@@ -401,37 +424,28 @@ if (empty($empresasMarquee)) {
                     $stmt = $pdo->query("SELECT Nombre as nombre, Cargo as cargo, Texto as texto, Estrellas as estrellas FROM testimonios ORDER BY Id DESC");
                     $testimoniosDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 } catch (PDOException $e) {
-                    // Ignorar silenciosamente si hay error al cargar
+                    // Si no existe la tabla, auto-crearla para futuras lecturas
+                    try {
+                        $pdo->exec("CREATE TABLE IF NOT EXISTS `testimonios` (
+                          `Id` int(11) NOT NULL AUTO_INCREMENT,
+                          `Nombre` varchar(256) NOT NULL,
+                          `Cargo` varchar(256) NOT NULL,
+                          `Texto` text NOT NULL,
+                          `Estrellas` int(11) NOT NULL,
+                          `FechaCreacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                          PRIMARY KEY (`Id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+                    } catch (PDOException $e2) {}
                 }
             }
 
-            $testimoniosEstaticos = [
-                ['texto' => '"La certificación de nuestro cableado estructurado fue impecable. El orden y la documentación técnica superaron nuestras expectativas."', 'nombre' => 'Carlos Mendoza', 'cargo' => 'Director de IT, TechCorp', 'estrellas' => 5],
-                ['texto' => '"Gracias a xcolnet, nuestra red Wi-Fi corporativa ahora es estable y segura. El soporte técnico 24/7 es realmente proactivo."', 'nombre' => 'Elena Rodríguez', 'cargo' => 'Gerente de Operaciones, Global Net', 'estrellas' => 5],
-                ['texto' => '"El sistema de control biométrico y CCTV integrado nos ha dado una tranquilidad total sobre la seguridad de nuestros nodos."', 'nombre' => 'Ricardo Silva', 'cargo' => 'Jefe de Infraestructura, Data Hub', 'estrellas' => 5],
-                ['texto' => '"Excelente tiempo de respuesta y atención profesional. Lograron migrar nuestra infraestructura de servidores sin interrumpir la operación."', 'nombre' => 'Andrea Morales', 'cargo' => 'Líder de Sistemas, Systems S.A.', 'estrellas' => 5],
-                ['texto' => '"Implementaron la infraestructura de red de nuestras nuevas oficinas con la mejor calidad y certificación Cat6A. 100% recomendados."', 'nombre' => 'Gabriel Torres', 'cargo' => 'Gerente General, InfraStruc', 'estrellas' => 5],
-                ['texto' => '"El monitoreo de cámaras IP con analítica de IA revolucionó el control de acceso de nuestro centro de cómputo."', 'nombre' => 'Lucía Restrepo', 'cargo' => 'Directora de Seguridad, Global Data', 'estrellas' => 5],
-                ['texto' => '"Excelente trabajo en la reorganización y peinado de nuestro rack principal. Ahora la ventilación y el mantenimiento son muy sencillos."', 'nombre' => 'Mauricio Gómez', 'cargo' => 'Coordinador de TI, BanCrecimiento', 'estrellas' => 5],
-                ['texto' => '"La consultoría de redes de xcolnet optimizó la latencia de nuestras llamadas VoIP y videoconferencias corporativas de inmediato."', 'nombre' => 'Diana Patrias', 'cargo' => 'Gerente de Tecnología, InnovaSoft', 'estrellas' => 5],
-                ['texto' => '"Su soporte técnico 24/7 resolvió un cuello de botella crítico en nuestros switches en tiempo récord. El servicio es sobresaliente."', 'nombre' => 'Fernando Rojas', 'cargo' => 'Administrador de Red, ConnectPlus', 'estrellas' => 5],
-                ['texto' => '"La instalación de alarmas y cámaras perimetrales integradas con analítica inteligente superó todos nuestros requerimientos de seguridad."', 'nombre' => 'Sofía Valenzuela', 'cargo' => 'Jefa de Seguridad, SafeCore', 'estrellas' => 5],
-                ['texto' => '"Un socio tecnológico de total confianza. Cumplieron con todos los estándares internacionales y normativos de redes en nuestra obra."', 'nombre' => 'Alejandro Castro', 'cargo' => 'Director de Proyectos, BuildCorp', 'estrellas' => 5],
-                ['texto' => '"El control de acceso por reconocimiento facial y huella dactilar ha mejorado drásticamente la seguridad de nuestras bodegas."', 'nombre' => 'Camila López', 'cargo' => 'Gerente de IT, SmartLogistics', 'estrellas' => 5],
-                ['texto' => '"La configuración de enlaces redundantes y alta disponibilidad de red garantizó la continuidad del negocio para nuestros clientes."', 'nombre' => 'Juan Sebastián', 'cargo' => 'Administrador de Sistemas, CloudServices', 'estrellas' => 5],
-                ['texto' => '"Nuestra cobertura Wi-Fi para huéspedes mejoró notablemente gracias a los puntos de acceso que instaló y gestiona xcolnet."', 'nombre' => 'Natalia Herrera', 'cargo' => 'Directora de Compras, Hotel Plaza', 'estrellas' => 5],
-                ['texto' => '"Implementaron un cableado estructurado impecable en todas nuestras aulas y laboratorios. Su orden al peinar cables es excelente."', 'nombre' => 'Jorge Iván Ortiz', 'cargo' => 'Coordinador de Infraestructura, EduTech', 'estrellas' => 5],
-                ['texto' => '"Muy satisfechos con el soporte de fibra óptica y certificación de enlaces. Su equipo de ingenieros cuenta con el mejor equipo de prueba."', 'nombre' => 'Marcela Castro', 'cargo' => 'Líder de Redes, NetBuilders', 'estrellas' => 5],
-                ['texto' => '"Instalaron un sistema de monitoreo remoto en nuestras plantas de procesamiento que nos permite controlar todo desde una app centralizada."', 'nombre' => 'Felipe Restrepo', 'cargo' => 'Gerente de IT, AgroIndustrias', 'estrellas' => 5],
-                ['texto' => '"El control de acceso biométrico de alta precisión para áreas restringidas de nuestra clínica funciona a la perfección las 24 horas."', 'nombre' => 'Liliana Suárez', 'cargo' => 'Directora Operativa, MediClinics', 'estrellas' => 5],
-                ['texto' => '"Los ingenieros de xcolnet solucionaron de raíz los cortes intermitentes de nuestra red local. Su diagnóstico fue muy preciso y profesional."', 'nombre' => 'Gustavo Hernández', 'cargo' => 'Jefe de Sistemas, ComercioGlobal', 'estrellas' => 5],
-                ['texto' => '"El servicio preventivo programado que ofrecen mantiene nuestra red de tiendas operando sin caídas de facturación."', 'nombre' => 'Sandra Milena', 'cargo' => 'Gerente de Tecnología, RetailGroup', 'estrellas' => 5]
-            ];
+            // Sin comentarios ficticios/falsos: solo opiniones reales
+            $testimoniosEstaticos = [];
 
-            // Combinar testimonios: DB (del más nuevo al más antiguo) primero, seguidos por los estáticos
+            // Combinar testimonios: únicamente testimonios auténticos
             $testimonios = array_merge($testimoniosDb, $testimoniosEstaticos);
 
-            // Seleccionar 3 testimonios aleatorios iniciales para el carrusel de inicio
+            // Seleccionar hasta 3 testimonios para la tanda inicial
             $testimoniosMezclados = $testimonios;
             shuffle($testimoniosMezclados);
             $tandaInicial = array_slice($testimoniosMezclados, 0, 3);
@@ -506,22 +520,35 @@ if (empty($empresasMarquee)) {
             </div>
             
             <div id="testimonios-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity duration-500 ease-in-out" style="opacity: 1;">
-                <?php foreach ($tandaInicial as $test): ?>
-                    <div class="bg-white border border-outline-variant/30 rounded-xl p-8 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between">
-                        <div>
-                            <div class="flex gap-1 mb-4 text-amber-400">
-                                <?php for ($s = 0; $s < $test['estrellas']; $s++): ?>
-                                    <svg class="w-5 h-5 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <?php endfor; ?>
+                <?php if (!empty($tandaInicial)): ?>
+                    <?php foreach ($tandaInicial as $test): ?>
+                        <div class="bg-white border border-outline-variant/30 rounded-xl p-8 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between">
+                            <div>
+                                <div class="flex gap-1 mb-4 text-amber-400">
+                                    <?php for ($s = 0; $s < $test['estrellas']; $s++): ?>
+                                        <svg class="w-5 h-5 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <?php endfor; ?>
+                                </div>
+                                <p class="text-on-surface-variant font-body-md mb-6 italic leading-relaxed"><?php echo htmlspecialchars($test['texto']); ?></p>
                             </div>
-                            <p class="text-on-surface-variant font-body-md mb-6 italic leading-relaxed"><?php echo htmlspecialchars($test['texto']); ?></p>
+                            <div>
+                                <p class="font-bold text-on-surface mb-0"><?php echo htmlspecialchars($test['nombre']); ?></p>
+                                <p class="text-label-md text-outline mb-0"><?php echo htmlspecialchars($test['cargo']); ?></p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="font-bold text-on-surface mb-0"><?php echo htmlspecialchars($test['nombre']); ?></p>
-                            <p class="text-label-md text-outline mb-0"><?php echo htmlspecialchars($test['cargo']); ?></p>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-span-full py-12 px-6 text-center bg-white border border-outline-variant/30 rounded-2xl shadow-sm max-w-lg mx-auto">
+                        <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                         </div>
+                        <h3 class="font-headline-sm text-lg font-bold text-on-surface mb-2">¡Sé el primero en compartir tu experiencia!</h3>
+                        <p class="text-sm text-on-surface-variant mb-6">Tu opinión es fundamental para nosotros y ayuda a otras empresas a conocer nuestros servicios.</p>
+                        <button type="button" onclick="document.getElementById('openCommentModalBtn').click()" class="px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-md">
+                            Escribir un Comentario
+                        </button>
                     </div>
-                <?php endforeach; ?>
+                <?php endif; ?>
             </div>
 
             <!-- Modal para ver todos los comentarios -->
@@ -549,7 +576,12 @@ if (empty($empresasMarquee)) {
 
                     <!-- Lista scrollable de comentarios del más nuevo al más antiguo -->
                     <div class="p-6 overflow-y-auto space-y-4 max-h-[60vh] bg-surface-container-low/30" id="allCommentsList">
-                        <?php foreach ($testimonios as $index => $test): ?>
+                        <?php if (empty($testimonios)): ?>
+                            <div class="py-12 text-center text-on-surface-variant text-sm">
+                                Aún no hay comentarios registrados. ¡Sé el primero en compartir tu experiencia!
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($testimonios as $index => $test): ?>
                             <div class="comment-item bg-white border border-outline-variant/30 rounded-xl p-5 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between" data-search="<?php echo htmlspecialchars(strtolower(($test['nombre'] ?? '') . ' ' . ($test['cargo'] ?? '') . ' ' . ($test['texto'] ?? ''))); ?>">
                                 <div>
                                     <div class="flex items-center justify-between gap-2 mb-3">
@@ -580,6 +612,7 @@ if (empty($empresasMarquee)) {
                                 </div>
                             </div>
                         <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                     
                     <!-- Modal Footer -->
@@ -750,8 +783,6 @@ if (empty($empresasMarquee)) {
                     });
                 }
 
-                if (!container || !testimoniosData || testimoniosData.length === 0) return;
-
                 function escapeHtml(str) {
                     return str
                         .replace(/&/g, "&amp;")
@@ -762,8 +793,9 @@ if (empty($empresasMarquee)) {
                 }
 
                 // Rotador automático
-                let rotarInterval;
+                let rotarInterval = null;
                 function rotarTestimonios() {
+                    if (!container || !testimoniosData || testimoniosData.length === 0) return;
                     container.style.opacity = '0';
                     setTimeout(() => {
                         const mezclados = [...testimoniosData].sort(() => 0.5 - Math.random());
@@ -798,8 +830,10 @@ if (empty($empresasMarquee)) {
                 }
 
                 function reiniciarIntervalo() {
-                    clearInterval(rotarInterval);
-                    rotarInterval = setInterval(rotarTestimonios, 8000);
+                    if (rotarInterval) clearInterval(rotarInterval);
+                    if (testimoniosData && testimoniosData.length > 0) {
+                        rotarInterval = setInterval(rotarTestimonios, 8000);
+                    }
                 }
                 
                 reiniciarIntervalo();
